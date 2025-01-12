@@ -1,0 +1,63 @@
+{
+  "name": "be",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BCTP001/be.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BCTP001/be/issues"
+  },
+  "homepage": "https://github.com/BCTP001/be#readme",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18.0"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "dev": "concurrently \"ts-node-dev --respawn --watch ./**/*.graphql ./src/index.ts\" \"npm run generate\"",
+    "start": "npm run compile && nodemon ./dist/index.js",
+    "test": "jest",
+    "generate": "graphql-codegen --watch \"src/schema.graphql\""
+  },
+  "dependencies": {
+    "@apollo/datasource-rest": "^6.4.1",
+    "@apollo/server": "^4.11.3",
+    "@parcel/watcher": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "eslint": "^9.18.0",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.3",
+    "@graphql-codegen/typescript": "^4.1.2",
+    "@graphql-codegen/typescript-resolvers": "^4.4.1",
+    "@types/jest": "^29.0.3",
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.2.2",
+    "jest": "^29.0.3",
+    "nodemon": "^3.0.0",
+    "ts-jest": "^29.0.2",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "src"
+    ],
+    "globals": {
+      "ts-jest": {
+        "testRegext": "/__tests__/.*.test.ts",
+        "verbose": true
+      }
+    }
+  }
+}
