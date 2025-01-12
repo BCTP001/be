@@ -5,11 +5,18 @@ import { readFileSync } from "fs";
 import path from "path";
 import { gql } from "graphql-tag";
 
+import { MySQLAPI } from "./datasources/mysql-api";
+
 const typeDefs = gql(
   readFileSync(path.resolve(__dirname, "./schema.graphql"), {
     encoding: "utf-8",
   })
 )
+
+const knexConfig = {
+  client: "mysql",
+  connection: ""
+};
 
 async function startApolloServer() {
   const server = new ApolloServer({
@@ -23,6 +30,7 @@ async function startApolloServer() {
 
         return {
           dataSources: {
+            mySQLAPI: new MySQLAPI({ knexConfig, cache })
           }
         }
       },

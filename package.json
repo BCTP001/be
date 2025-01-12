@@ -27,6 +27,7 @@
   "dependencies": {
     "@apollo/datasource-rest": "^6.4.1",
     "@apollo/server": "^4.11.3",
+    "@nic-jennings/sql-datasource": "^0.0.7",
     "@parcel/watcher": "^2.4.0",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "eslint": "^9.18.0",
