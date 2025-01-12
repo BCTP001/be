@@ -18,7 +18,7 @@
     "node": ">=18.0"
   },
   "scripts": {
-    "lint": "eslint --no-cache . --report-unused-disable-directives --max-warnings 0 --fix",
+    "lint": "eslint src/**/*.ts --report-unused-disable-directives --fix --ignore-pattern src/types/generated.ts",
     "build": "npm run lint && tsc",
     "compile": "tsc",
     "dev": "concurrently \"ts-node-dev --respawn --watch ./**/*.graphql ./src/index.ts\" \"npm run generate\"",
@@ -31,7 +31,8 @@
     "@apollo/server": "^4.11.3",
     "@parcel/watcher": "^2.4.0",
     "graphql": "^16.10.0",
-    "graphql-tag": "^2.12.6"
+    "graphql-tag": "^2.12.6",
+    "typescript-eslint": "^8.19.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.26.5",

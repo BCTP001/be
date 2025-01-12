@@ -1,4 +1,7 @@
+import { AladinAPI } from "../datasources/aladinAPI";
+
 export type DataSourceContext = {
-  dataSources: {
-  };
+	dataSources: {
+		aladinAPI: AladinAPI
+	};
 }

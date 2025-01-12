@@ -1,9 +1,11 @@
-const { defineConfig } = require('eslint-define-config');
 const typescriptParser = require('@typescript-eslint/parser');
 const typescriptEslintPlugin = require('@typescript-eslint/eslint-plugin');
+const tseslint = require('typescript-eslint')
 
-module.exports = defineConfig([
+module.exports = tseslint.config(
+  { ignores: ['dist', 'codegen.ts', 'node_modules']},
   {
+    files: ["src/**/*.ts"],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
@@ -21,12 +23,4 @@ module.exports = defineConfig([
     },
     ignores: ['codegen.ts'],
   },
- {
-  files: ['*.ts', '*.tsx'],
-  rules: {
-
-  },
-  ignores: ['codegen.ts'],
-},
-]);
-
+);
