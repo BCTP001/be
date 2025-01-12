@@ -1,8 +1,8 @@
-import { defineConfig } from 'eslint-define-config';
-import typescriptParser from '@typescript-eslint/parser';
-import * as typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
+const { defineConfig } = require('eslint-define-config');
+const typescriptParser = require('@typescript-eslint/parser');
+const typescriptEslintPlugin = require('@typescript-eslint/eslint-plugin');
 
-export default defineConfig([
+module.exports = defineConfig([
   {
     languageOptions: {
       parser: typescriptParser,
@@ -11,7 +11,7 @@ export default defineConfig([
       },
     },
     plugins: {
-      '@typescript-eslint': typescriptEslintPlugin, 
+      '@typescript-eslint': typescriptEslintPlugin,
     },
     rules: {
       'no-unused-vars': 'warn',
@@ -21,11 +21,12 @@ export default defineConfig([
     },
     ignores: ['codegen.ts'],
   },
-  {
-    files: ['*.ts', '*.tsx'],
-    rules: {
+ {
+  files: ['*.ts', '*.tsx'],
+  rules: {
 
-    },
   },
+  ignores: ['codegen.ts'],
+},
 ]);
 
