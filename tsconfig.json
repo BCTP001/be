@@ -23,6 +23,9 @@
     "typeRoots": ["node_modules/@types", "src/@types"],
   },
   "files": ["src/graphql.d.ts"],
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "eslint.config.js"
+  ],
   "exclude": ["codegen.ts", "dist"]
 }

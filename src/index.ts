@@ -19,8 +19,6 @@ async function startApolloServer() {
     server,
     {
       context: async () => {
-        const { cache } = server;
-
         return {
           dataSources: {
           }
