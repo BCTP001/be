@@ -1,9 +1,8 @@
 import { RESTDataSource  } from "@apollo/datasource-rest";
+import type { AladinAPIBookItem, AladinAPISearchResponse } from '../types/interface/aladinAPI';
 import dotenv from 'dotenv';
 
-
-
-dotenv.config({ path: '../../.env' }); // .env 파일 경로 설정
+dotenv.config();
 
 // aladinApiBaseUrl: string = 'https://www.aladin.co.kr/ttb/api/ItemList.aspx';
 // aladinApiSearchUrl: string = 'http://www.aladin.co.kr/ttb/api/ItemSearch.aspx';
@@ -20,19 +19,23 @@ export class AladinAPI extends RESTDataSource{
       	return process.env.ALADIN_API_KEY;
     }
 
-    async searchBooks(query: string) {
+    async searchBooks(query: string): Promise<AladinAPIBookItem[]> {
 		try {
-			console.log(query);
-			const response = await this.get('ItemSearch.aspx', {
+
+			const aladinAPISearchResponseString: string = await this.get('ItemSearch.aspx', {
 				params: {
-					ttbkey: this.aladinApiKey, // API 키
-					Query: query,              // 검색할 책 제목
+					ttbkey: this.aladinApiKey,
+					Query: query,  
+					QueryType: 'Title',
 					SearchTarget: 'Book',
-					// MaxResults: 10,            // 검색 결과 수 제한
+					Sort: 'SalesPoint',
+					MaxResults: '2',  
+					output: 'JS'
 				}
 			});
-
-			return [response];
+			const aladinAPISearchResponse: AladinAPISearchResponse = JSON.parse(aladinAPISearchResponseString.slice(0,-1));
+			const response = aladinAPISearchResponse.item;
+			return response;
 
 		} catch (error) {
 			console.log(error);

@@ -1,5 +1,42 @@
+type AladinAPIBookItem {
+    title: String
+    link: String
+    author: String
+    pubDate: String
+    description: String
+    creator: String
+    isbn: String
+    isbn13: String
+    itemId: Int
+    priceSales: Int
+    priceStandard: Int
+    stockStatus: String
+    mileage: Int
+    cover: String
+    categoryId: Int
+    categoryName: String
+    publisher: String
+    customerReivewRank: Int
+}
+
+type AladinAPISearchResponse {
+    version: String
+    title: String
+    link: String
+    pubDate: String
+    imageUrl: String
+    totalResults: Int
+    startIndex: Int
+    itemsPerPage: Int
+    query: String
+    searchCategoryId: Int
+    searchCategoryName: String
+    item: [AladinAPIBookItem]
+}
+
 type Query {
     spaceholder: Int!
+    searchBooks(query: String!): [AladinAPIBookItem]
 }
 
 type Book {
@@ -7,8 +44,4 @@ type Book {
     author: String
     isbn: String
     link: String
-}
-
-type Query {
-    searchBooks(query: String!): [Book]
 }
