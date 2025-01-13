@@ -28,6 +28,7 @@ export class AladinAPI extends RESTDataSource{
 					Query: query,  
 					QueryType: 'Title',
 					SearchTarget: 'Book',
+					Cover: 'Big',
 					Sort: 'SalesPoint',
 					MaxResults: '2',  
 					output: 'JS'
