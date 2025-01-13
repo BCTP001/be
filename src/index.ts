@@ -2,20 +2,21 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { resolvers } from "./resolvers/aladinAPIResolver"
 import { AladinAPI } from "./datasources/aladinAPI"
-
+import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
 import path from "path";
 import { gql } from "graphql-tag";
+import { DocumentNode } from "graphql";
 
-const typeDefs = gql(
+const typeDefs: DocumentNode = gql(
   readFileSync(path.resolve(__dirname, "./schema.graphql"), {
     encoding: "utf-8",
   })
 )
 
-async function startApolloServer() {
+const startApolloServer = async () => {
 
-  const server = new ApolloServer({
+  const server: ApolloServer<DataSourceContext> = new ApolloServer({
     typeDefs,
     resolvers
   });

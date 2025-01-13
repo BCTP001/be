@@ -19,7 +19,7 @@ module.exports = tseslint.config(
       'no-unused-vars': 'warn',
       'no-console': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
     },
     ignores: ['codegen.ts'],
   },

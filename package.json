@@ -18,7 +18,7 @@
     "node": ">=18.0"
   },
   "scripts": {
-    "lint": "eslint src/**/*.ts --report-unused-disable-directives --fix --ignore-pattern src/types/generated.ts",
+    "lint": "eslint src/**/*.ts --report-unused-disable-directives --fix --ignore-pattern src/types/generated.ts --no-warn-ignored",
     "build": "npm run lint && tsc",
     "compile": "tsc",
     "dev": "concurrently \"ts-node-dev --respawn --watch ./**/*.graphql ./src/index.ts\" \"npm run generate\"",

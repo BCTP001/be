@@ -35,7 +35,7 @@ export class AladinAPI extends RESTDataSource{
 				}
 			});
 			const aladinAPISearchResponse: AladinAPISearchResponse = JSON.parse(aladinAPISearchResponseString.slice(0,-1));
-			const response = aladinAPISearchResponse.item;
+			const response: AladinAPIBookItem[] = aladinAPISearchResponse.item;
 			return response;
 
 		} catch (error) {
