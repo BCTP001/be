@@ -21,9 +21,8 @@
     "lint": "eslint src/**/*.ts --report-unused-disable-directives --fix --ignore-pattern src/types/generated.ts --no-warn-ignored",
     "build": "npm run lint && tsc",
     "compile": "tsc",
-    "dev": "concurrently \"ts-node-dev --respawn --watch ./**/*.graphql ./src/index.ts\" \"npm run generate\"",
+    "dev": "concurrently \"node -r ts-node/register --watch-path=\"./src/schema.graphql\" ./src/index.ts\" \"npm run generate\"",
     "start": "npm run compile && nodemon ./dist/index.js",
-    "test": "jest",
     "generate": "graphql-codegen --watch \"src/schema.graphql\""
   },
   "dependencies": {
@@ -39,31 +38,14 @@
     "@graphql-codegen/cli": "^5.0.3",
     "@graphql-codegen/typescript": "^4.1.2",
     "@graphql-codegen/typescript-resolvers": "^4.4.1",
-    "@types/jest": "^29.0.3",
-    "@types/node": "^20.0.0",
+    "@types/node": "^22.10.6",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.1.2",
     "eslint": "^9.18.0",
     "eslint-define-config": "^2.1.0",
-    "jest": "^29.0.3",
     "nodemon": "^3.0.0",
-    "ts-jest": "^29.0.2",
     "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.0"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "roots": [
-      "src"
-    ],
-    "globals": {
-      "ts-jest": {
-        "testRegext": "/__tests__/.*.test.ts",
-        "verbose": true
-      }
-    }
   }
 }
