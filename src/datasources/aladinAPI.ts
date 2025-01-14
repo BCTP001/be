@@ -1,5 +1,5 @@
 import { RESTDataSource  } from "@apollo/datasource-rest";
-import type { AladinAPIBookItem, AladinAPISearchResponse } from '../types/interface/aladinAPI';
+import type { AladinAPIBookItem, AladinAPISearchResponse, SearchOption } from '../types/interface/aladinAPI';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,22 +19,25 @@ export class AladinAPI extends RESTDataSource{
       	return process.env.ALADIN_API_KEY;
     }
 
-    async searchBooks(query: string): Promise<AladinAPIBookItem[]> {
+    async searchBooks(searchOption: SearchOption): Promise<AladinAPIBookItem[]> {
 		try {
 
 			const aladinAPISearchResponseString: string = await this.get('ItemSearch.aspx', {
 				params: {
 					ttbkey: this.aladinApiKey,
-					Query: query,  
-					QueryType: 'Title',
+					Query: searchOption.searchQuery,  
+					QueryType: searchOption.queryType,
 					SearchTarget: 'Book',
 					Cover: 'Big',
-					Sort: 'SalesPoint',
-					MaxResults: '2',  
+					Sort: searchOption.sort,
+					MaxResults: searchOption.maxResult,  
 					output: 'JS'
 				}
 			});
-			const aladinAPISearchResponse: AladinAPISearchResponse = JSON.parse(aladinAPISearchResponseString.slice(0,-1));
+	
+			var cleanedString: string = aladinAPISearchResponseString.slice(0, -1).replace(/&amp;/g, '&').replace(/\\(?!["\\/bfnrtu])/g, '');
+
+			const aladinAPISearchResponse: AladinAPISearchResponse = JSON.parse(cleanedString);
 			const response: AladinAPIBookItem[] = aladinAPISearchResponse.item;
 			return response;
 

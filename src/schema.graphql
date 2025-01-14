@@ -34,9 +34,15 @@ type AladinAPISearchResponse {
     item: [AladinAPIBookItem]
 }
 
+input SearchOption {
+    searchQuery: String!
+    queryType: String
+    sort: String
+    maxResult: String
+}
+
 type Query {
-    spaceholder: Int!
-    searchBooks(query: String!): [AladinAPIBookItem]
+    searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
 }
 
 type Book {

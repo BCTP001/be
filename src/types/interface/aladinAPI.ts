@@ -2,6 +2,14 @@ export interface SearchText {
     query: string
 }
 
+
+export interface SearchOption {
+    searchQuery: string
+    queryType?: string
+    sort?: string
+    maxResult?: string
+}
+
 export interface AladinAPIBookItem {
     title: string
     link: string
