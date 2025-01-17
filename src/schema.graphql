@@ -1,53 +1,53 @@
 type AladinAPIBookItem {
-    title: String
-    link: String
-    author: String
-    pubDate: String
-    description: String
-    creator: String
-    isbn: String
-    isbn13: String
-    itemId: Int
-    priceSales: Int
-    priceStandard: Int
-    stockStatus: String
-    mileage: Int
-    cover: String
-    categoryId: Int
-    categoryName: String
-    publisher: String
-    customerReivewRank: Int
+  title: String
+  link: String
+  author: String
+  pubDate: String
+  description: String
+  creator: String
+  isbn: String
+  isbn13: String
+  itemId: Int
+  priceSales: Int
+  priceStandard: Int
+  stockStatus: String
+  mileage: Int
+  cover: String
+  categoryId: Int
+  categoryName: String
+  publisher: String
+  customerReivewRank: Int
 }
 
 type AladinAPISearchResponse {
-    version: String
-    title: String
-    link: String
-    pubDate: String
-    imageUrl: String
-    totalResults: Int
-    startIndex: Int
-    itemsPerPage: Int
-    query: String
-    searchCategoryId: Int
-    searchCategoryName: String
-    item: [AladinAPIBookItem]
+  version: String
+  title: String
+  link: String
+  pubDate: String
+  imageUrl: String
+  totalResults: Int
+  startIndex: Int
+  itemsPerPage: Int
+  query: String
+  searchCategoryId: Int
+  searchCategoryName: String
+  item: [AladinAPIBookItem]
 }
 
 input SearchOption {
-    searchQuery: String!
-    queryType: String
-    sort: String
-    maxResult: String
+  searchQuery: String!
+  queryType: String
+  sort: String
+  maxResult: String
 }
 
 type Query {
-    searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
+  searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
 }
 
 type Book {
-    title: String
-    author: String
-    isbn: String
-    link: String
+  title: String
+  author: String
+  isbn: String
+  link: String
 }

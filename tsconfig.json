@@ -25,7 +25,7 @@
   "files": ["src/graphql.d.ts"],
   "include": [
     "src/**/*.ts",
-    "eslint.config.js"
+    "eslint.config.mjs"
   ],
   "exclude": ["codegen.ts", "dist"]
 }
