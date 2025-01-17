@@ -15,7 +15,7 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "esnext.asynciterable", "DOM"],
-    "types": ["node", "jest"],
+    "types": ["node"],
     "baseUrl": ".",
     "paths": {
       "*": ["types/*"]
@@ -23,6 +23,9 @@
     "typeRoots": ["node_modules/@types", "src/@types"],
   },
   "files": ["src/graphql.d.ts"],
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*.ts",
+    "eslint.config.mjs"
+  ],
   "exclude": ["codegen.ts", "dist"]
 }

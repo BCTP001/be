@@ -9,7 +9,7 @@ const config: CodegenConfig = {
         contextType: "../context#DataSourceContext",
       },
     },
-  }
+  },
 };
 
 export default config;

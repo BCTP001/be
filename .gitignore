@@ -1,6 +1,9 @@
 # Ignore the compiled output.
 dist/
 
+# env
+.env
+
 # TypeScript incremental compilation cache
 *.tsbuildinfo
 
