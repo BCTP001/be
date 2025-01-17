@@ -1,6 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { resolvers } from "./resolvers/aladinAPIResolver";
+import { resolvers as aladinAPIResolver } from "./resolvers/aladinAPIResolver";
 import { AladinAPI } from "./datasources/aladinAPI";
 import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
@@ -13,6 +13,10 @@ const typeDefs: DocumentNode = gql(
     encoding: "utf-8",
   }),
 );
+
+const resolvers = [
+    aladinAPIResolver
+]
 
 const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({
