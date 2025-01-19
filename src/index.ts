@@ -9,14 +9,12 @@ import { gql } from "graphql-tag";
 import { DocumentNode } from "graphql";
 
 const typeDefs: DocumentNode = gql(
-  readFileSync(path.resolve(__dirname, "./schema.graphql"), {
+  readFileSync(path.resolve(__dirname, "../src/schema.graphql"), {
     encoding: "utf-8",
   }),
 );
 
-const resolvers = [
-    aladinAPIResolver
-]
+const resolvers = [aladinAPIResolver];
 
 const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({
