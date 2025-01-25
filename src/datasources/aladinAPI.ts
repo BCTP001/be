@@ -3,6 +3,8 @@ import type {
   AladinAPIBookItem,
   AladinAPISearchResponse,
   SearchOption,
+  AladinAPIGetBookInfoResponse,
+  GetBookInfoItem,
 } from "../types/interface/aladinAPI";
 import dotenv from "dotenv";
 
@@ -48,6 +50,36 @@ export class AladinAPI extends RESTDataSource {
       const aladinAPISearchResponse: AladinAPISearchResponse =
         JSON.parse(cleanedString);
       const response: AladinAPIBookItem[] = aladinAPISearchResponse.item;
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to fetch books from Aladin API");
+    }
+  }
+
+  async getBookInfo(isbn13: string): Promise<GetBookInfoItem[]> {
+    try {
+      const aladinAPIGetBookInfoResponseString: string = await this.get(
+        "ItemLookUp.aspx",
+        {
+          params: {
+            ttbkey: this.aladinApiKey,
+            itemID: isbn13,
+            itemIdType: "ISBN13",
+            cover: "Big",
+            output: "JS",
+          },
+        },
+      );
+      console.log(aladinAPIGetBookInfoResponseString);
+      const cleanedString: string = aladinAPIGetBookInfoResponseString
+        .slice(0, -1)
+        .replace(/&amp;/g, "&")
+        .replace(/\\(?!["\\/bfnrtu])/g, "");
+
+      const aladinAPIGetBookInfoResponse: AladinAPIGetBookInfoResponse =
+        JSON.parse(cleanedString);
+      const response: GetBookInfoItem[] = aladinAPIGetBookInfoResponse.item;
       return response;
     } catch (error) {
       console.log(error);

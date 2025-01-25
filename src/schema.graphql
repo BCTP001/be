@@ -1,3 +1,5 @@
+# SEARCH BOOKS
+
 type AladinAPIBookItem {
   title: String
   link: String
@@ -41,8 +43,62 @@ input SearchOption {
   maxResult: String
 }
 
+# GET BOOK INFO
+
+input GetBookInfoRequest {
+  isbn13: String!
+}
+
+type Author {
+  authorType: String
+  authorid: Int
+  desc: String
+  name: String
+}
+
+type Ebook {
+  itemId: Int
+  isbn: String
+  priceSales: Int
+  link: String
+}
+
+type Bookinfo {
+  subTitle: String
+  originalTitle: String
+  itemPage: Int
+  toc: String
+  letslookimg: [String]
+  author: [Author]
+  ebookList: [Ebook]
+}
+
+type GetBookInfoItem {
+  title: String
+  link: String
+  author: String
+  pubDate: String
+  description: String
+  creator: String
+  isbn: String
+  isbn13: String
+  itemId: Int
+  priceSales: Int
+  priceStandard: Int
+  stockStatus: String
+  mileage: Int
+  cover: String
+  categoryId: Int
+  categoryName: String
+  publisher: String
+  customerReivewRank: Int
+  bookinfo: Bookinfo
+}
+
+
 type Query {
   searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
+  getBookInfo(getBookInfoRequest: GetBookInfoRequest): [GetBookInfoItem]
 }
 
 type Book {
