@@ -97,8 +97,8 @@ type GetBookInfoItem {
 
 
 type Query {
-  searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
-  getBookInfo(getBookInfoRequest: GetBookInfoRequest): [GetBookInfoItem]
+  searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
+  getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
 }
 
 type Book {

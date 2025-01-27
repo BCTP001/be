@@ -1,7 +1,6 @@
 import type {
   SearchOption,
   GetBookInfoRequest,
-  AladinAPIBookItem,
   GetBookInfoItem,
 } from "../types/interface/aladinAPI";
 import { type Resolvers } from "../types/generated";
@@ -9,7 +8,7 @@ import { DataSourceContext } from "../context";
 
 export const resolvers: Resolvers = {
   Query: {
-    searchBooks: async (
+    searchBooksAndGetBookInfo: async (
       _source: undefined,
       { searchOption }: { searchOption: SearchOption },
       { dataSources }: DataSourceContext,
@@ -18,9 +17,16 @@ export const resolvers: Resolvers = {
         if (!searchOption || !searchOption.searchQuery) {
           throw new Error("searchQuery is required");
         }
-        const books: AladinAPIBookItem[] =
-          await dataSources.aladinAPI.searchBooks(searchOption);
-        return books;
+        const bookIsbn13List: string[] = await dataSources.aladinAPI.getBookIsbn13List(searchOption);
+        
+        const response: Promise<GetBookInfoItem>[] = [];
+
+        for (var i of bookIsbn13List){
+          const bookInfo: Promise<GetBookInfoItem> = dataSources.aladinAPI.getBookInfo(i);
+          response.push(bookInfo);
+        }
+
+        return await Promise.all(response);
       } catch (err) {
         console.log(err);
         throw new Error("Failed to fetch books from Aladin API");
@@ -36,7 +42,7 @@ export const resolvers: Resolvers = {
         if (!getBookInfoRequest || !getBookInfoRequest.isbn13) {
           throw new Error("itemId is required");
         }
-        const bookInfo: GetBookInfoItem[] =
+        const bookInfo: GetBookInfoItem =
           await dataSources.aladinAPI.getBookInfo(getBookInfoRequest.isbn13);
         console.log(bookInfo);
         return bookInfo;
