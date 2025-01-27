@@ -1,0 +1,39 @@
+services:
+  pg:
+    image: "postgres:17"
+    restart: "always"
+    build:
+      context: "."
+      dockerfile: "Dockerfile.pg"
+    volumes:
+      - "./local.pgdata:/var/lib/postgresql/data"
+      - "./pginit:/docker-entrypoint-initdb.d"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "db"
+      TZ: "Asia/Seoul"
+  node:
+    image: "node:20"
+    working_dir: "/usr/src/app"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_HOST: "pg"
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "db"
+    volumes:
+      - "../dist:/usr/src/app/dist"
+      - "../node_modules:/usr/src/app/node_modules"
+      - "../src:/usr/src/app/src"
+      - "../.env:/usr/src/app/.env"
+      - "../codegen.ts:/usr/src/app/codegen.ts"
+      - "../eslint.config.mjs:/usr/src/app/eslint.config.mjs"
+      - "../package.json:/usr/src/app/package.json"
+      - "../package-lock.json:/usr/src/app/package-lock.json"
+      - "../tsconfig.json:/usr/src/app/tsconfig.json"
+    ports:
+      - "4000:4000"
+    command: "sh -c \"npm install && npm run dev\""
