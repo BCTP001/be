@@ -43,6 +43,12 @@ input SearchOption {
 
 type Query {
   searchBooks(searchOption: SearchOption): [AladinAPIBookItem]
+  user(id: ID): User
+  users: [User]!
+}
+
+type Mutation {
+  createUser(username: String!, name: String!): User
 }
 
 type Book {
@@ -50,4 +56,10 @@ type Book {
   author: String
   isbn: String
   link: String
+}
+
+type User {
+  id: ID!
+  username: String!
+  name: String!
 }
