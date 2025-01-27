@@ -24,6 +24,16 @@ export class AladinAPI extends RESTDataSource {
     return process.env.ALADIN_API_KEY;
   }
 
+  preprocessAndParsing(responseString: string): AladinAPISearchResponse | AladinAPIGetBookInfoResponse {
+    const cleanedString: string = responseString
+        .slice(0, -1)
+        .replace(/&amp;/g, "&")
+        .replace(/\\(?!["\\/bfnrtu])/g, "");
+    const parsingResponse = JSON.parse(cleanedString);
+
+    return parsingResponse;
+  }
+
   async searchBooks(searchOption: SearchOption): Promise<AladinAPIBookItem[]> {
     try {
       const aladinAPISearchResponseString: string = await this.get(
@@ -42,15 +52,10 @@ export class AladinAPI extends RESTDataSource {
         },
       );
 
-      const cleanedString: string = aladinAPISearchResponseString
-        .slice(0, -1)
-        .replace(/&amp;/g, "&")
-        .replace(/\\(?!["\\/bfnrtu])/g, "");
+      const aladinAPISearchResponse: AladinAPISearchResponse = 
+      this.preprocessAndParsing(aladinAPISearchResponseString) as AladinAPISearchResponse;
 
-      const aladinAPISearchResponse: AladinAPISearchResponse =
-        JSON.parse(cleanedString);
-      const response: AladinAPIBookItem[] = aladinAPISearchResponse.item;
-      return response;
+      return aladinAPISearchResponse.item;
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch books from Aladin API");
@@ -71,15 +76,11 @@ export class AladinAPI extends RESTDataSource {
           },
         },
       );
-      const cleanedString: string = aladinAPIGetBookInfoResponseString
-        .slice(0, -1)
-        .replace(/&amp;/g, "&")
-        .replace(/\\(?!["\\/bfnrtu])/g, "");
 
       const aladinAPIGetBookInfoResponse: AladinAPIGetBookInfoResponse =
-        JSON.parse(cleanedString);
-      const response: GetBookInfoItem[] = aladinAPIGetBookInfoResponse.item;
-      return response[0];
+      this.preprocessAndParsing(aladinAPIGetBookInfoResponseString) as AladinAPIGetBookInfoResponse;
+      
+      return aladinAPIGetBookInfoResponse.item[0];
     } catch (error) {
       console.log(error);
       throw new Error("Failed to fetch books from Aladin API");
@@ -88,34 +89,14 @@ export class AladinAPI extends RESTDataSource {
 
   async getBookIsbn13List(searchOption: SearchOption): Promise<string[]> {
     try {
-      const aladinAPISearchResponseString: string = await this.get(
-        "ItemSearch.aspx",
-        {
-          params: {
-            ttbkey: this.aladinApiKey,
-            Query: searchOption.searchQuery,
-            QueryType: searchOption.queryType,
-            SearchTarget: "Book",
-            Cover: "Big",
-            Sort: searchOption.sort,
-            MaxResults: searchOption.maxResult,
-            output: "JS",
-          },
-        },
-      );
-      
-      const cleanedString: string = aladinAPISearchResponseString
-        .slice(0, -1)
-        .replace(/&amp;/g, "&")
-        .replace(/\\(?!["\\/bfnrtu])/g, "");
-      const aladinAPISearchResponse: AladinAPISearchResponse =
-        JSON.parse(cleanedString);
-      const bookItemList: AladinAPIBookItem[] = aladinAPISearchResponse.item;
+      const bookItemList: AladinAPIBookItem[] = await this.searchBooks(searchOption);
       const response: string[] = [];
+
       for (var i of bookItemList){
         if (i.isbn13) response.push(i.isbn13);
         else response.push(i.isbn);
       }
+
       return response;
     } catch(err){
       console.log(err);

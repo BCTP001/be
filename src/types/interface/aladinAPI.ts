@@ -111,5 +111,5 @@ export type AladinAPIGetBookInfoResponse = {
   query: string;
   searchCategoryId: number;
   searchCategoryName: string;
-  item: [GetBookInfoItem];
+  item: GetBookInfoItem[];
 };
