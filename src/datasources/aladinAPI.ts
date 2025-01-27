@@ -65,13 +65,12 @@ export class AladinAPI extends RESTDataSource {
           params: {
             ttbkey: this.aladinApiKey,
             itemID: isbn13,
-            itemIdType: "ISBN13",
+            itemIdType: (isbn13.length === 13) ? "ISBN13": "ISBN",
             cover: "Big",
             output: "JS",
           },
         },
       );
-      console.log(aladinAPIGetBookInfoResponseString);
       const cleanedString: string = aladinAPIGetBookInfoResponseString
         .slice(0, -1)
         .replace(/&amp;/g, "&")
@@ -104,18 +103,18 @@ export class AladinAPI extends RESTDataSource {
           },
         },
       );
-
+      
       const cleanedString: string = aladinAPISearchResponseString
         .slice(0, -1)
         .replace(/&amp;/g, "&")
         .replace(/\\(?!["\\/bfnrtu])/g, "");
-
       const aladinAPISearchResponse: AladinAPISearchResponse =
         JSON.parse(cleanedString);
       const bookItemList: AladinAPIBookItem[] = aladinAPISearchResponse.item;
       const response: string[] = [];
       for (var i of bookItemList){
-        response.push(i.isbn13);
+        if (i.isbn13) response.push(i.isbn13);
+        else response.push(i.isbn);
       }
       return response;
     } catch(err){

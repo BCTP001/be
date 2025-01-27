@@ -17,6 +17,7 @@ export const resolvers: Resolvers = {
         if (!searchOption || !searchOption.searchQuery) {
           throw new Error("searchQuery is required");
         }
+        
         const bookIsbn13List: string[] = await dataSources.aladinAPI.getBookIsbn13List(searchOption);
         
         const response: Promise<GetBookInfoItem>[] = [];
@@ -42,9 +43,10 @@ export const resolvers: Resolvers = {
         if (!getBookInfoRequest || !getBookInfoRequest.isbn13) {
           throw new Error("itemId is required");
         }
+
         const bookInfo: GetBookInfoItem =
           await dataSources.aladinAPI.getBookInfo(getBookInfoRequest.isbn13);
-        console.log(bookInfo);
+
         return bookInfo;
       } catch (err) {
         console.log(err);
