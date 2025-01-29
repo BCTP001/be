@@ -53,3 +53,16 @@ export interface Review {
   rating: Rating;
   content: Content;
 }
+
+export interface InsertReviewArgs {
+  userId: Id;
+  isbn: Isbn;
+  rating: Rating;
+  content: Content;
+}
+
+export interface UpdateReviewArgs {
+  id: Id;
+  rating: Rating;
+  content: Content;
+}

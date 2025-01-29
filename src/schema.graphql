@@ -118,9 +118,9 @@ type Query {
 type Mutation {
   createUser(username: String!, name: String!): User
   containBookInShelf(request: ContainBookInShelfRequest): ContainBookInShelfResponse
-  createReview(createReviewArgs: CreateReviewArgs!): Review
-  UpdateReview(updateReviewArgs: UpdateReviewArgs!): Review
-  DeleteReview(id: ID!): Review
+  createReview(createReviewArgs: CreateReviewArgs!): ID
+  updateReview(updateReviewArgs: UpdateReviewArgs!): ID
+  deleteReview(id: ID!): ID
 }
 
 type User {
