@@ -41,3 +41,15 @@ export interface ContainBookInShelfResponse {
 export interface ShelfId {
   shelfId: number;
 }
+
+export type Isbn = string;
+export type Rating = number;
+export type Content = string;
+
+export interface Review {
+  id: Id;
+  userId: Id;
+  isbn: Isbn;
+  rating: Rating;
+  content: Content;
+}
