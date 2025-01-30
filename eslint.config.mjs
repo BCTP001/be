@@ -23,6 +23,7 @@ export default [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
+      "no-control-regex": 0,
     },
   },
 ];

@@ -1,9 +1,5 @@
 // SEARCH
 
-export interface SearchText {
-  query: string;
-}
-
 export interface SearchOption {
   searchQuery: string;
   queryType?: string;
@@ -53,7 +49,6 @@ export interface GetBookInfoRequest {
   isbn13: string;
 }
 
-
 export interface Author {
   authorType: string;
   authorid: number;
@@ -97,10 +92,10 @@ export interface GetBookInfoItem {
   categoryName: string;
   publisher: string;
   customerReivewRank: number;
-  bookinfo: Bookinfo
+  bookinfo: Bookinfo;
 }
 
-export type AladinAPIGetBookInfoResponse = {
+export interface AladinAPIGetBookInfoResponse {
   version: string;
   title: string;
   link: string;
@@ -111,5 +106,37 @@ export type AladinAPIGetBookInfoResponse = {
   query: string;
   searchCategoryId: number;
   searchCategoryName: string;
-  item: [GetBookInfoItem];
-};
+  item: GetBookInfoItem[];
+}
+
+// RecommendBook
+
+export interface Isbn13AndIsbn {
+  isbn: string;
+  isbn13: string;
+}
+
+export interface AladinAPIRecommendBookListResponse {
+  version: string;
+  logo: string;
+  title: string;
+  link: string;
+  pubDate: string;
+  totalResults: number;
+  startIndex: number;
+  itemsPerPage: number;
+  query: string;
+  searchCategoryId: number;
+  searchCategoryName: string;
+  item: Isbn13AndIsbn[];
+}
+
+export interface RecommendBookListResponse {
+  queryType: string;
+  data: GetBookInfoItem[];
+}
+
+export interface RecommendBookIsbnObject {
+  queryType: string;
+  isbn13List: string[];
+}
