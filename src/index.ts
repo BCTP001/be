@@ -1,12 +1,15 @@
+import path from "path";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { resolvers as aladinAPIResolver } from "./resolvers/aladinAPIResolver";
+import { pgResolvers } from "./resolvers/pg";
 import { AladinAPI } from "./datasources/aladinAPI";
 import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
-import path from "path";
 import { gql } from "graphql-tag";
 import { DocumentNode } from "graphql";
+import { PGAPI } from "./datasources/pg-api";
+import knexConfig from "./knex";
 
 const typeDefs: DocumentNode = gql(
   readFileSync(path.resolve(__dirname, "../src/schema.graphql"), {
@@ -14,7 +17,7 @@ const typeDefs: DocumentNode = gql(
   }),
 );
 
-const resolvers = [aladinAPIResolver];
+const resolvers = [aladinAPIResolver, pgResolvers];
 
 const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({
@@ -23,11 +26,13 @@ const startApolloServer = async () => {
   });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 8080 },
+    listen: { port: 4000 },
     context: async () => {
+      const { cache } = server;
       return {
         dataSources: {
           aladinAPI: new AladinAPI(),
+          pgAPI: new PGAPI({ cache, knexConfig }),
         },
       };
     },

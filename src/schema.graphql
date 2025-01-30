@@ -70,11 +70,16 @@ type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
   getRecommendBookList: recommendBookListResponse
+  user(id: ID): User
+  users: [User]!
 }
 
-type Book {
-  title: String
-  author: String
-  isbn: String
-  link: String
+type Mutation {
+  createUser(username: String!, name: String!): User
+}
+
+type User {
+  id: ID!
+  username: String!
+  name: String!
 }
