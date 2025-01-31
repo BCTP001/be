@@ -61,15 +61,21 @@ type GetBookInfoItem {
 
 # RECOMMEND BOOK LIST
 
-type recommendBookListResponse {
-  queryType: String
-  data: [GetBookInfoItem]
+input recommendBookListRequest {
+  queryType: RecommendQueryType!
+}
+
+enum RecommendQueryType {
+  ItemNewAll
+  ItemNewSpecial
+  Bestseller
+  BlogBest
 }
 
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
-  getRecommendBookList: recommendBookListResponse
+  getRecommendBookList(request: recommendBookListRequest!): [GetBookInfoItem]
   user(id: ID): User
   users: [User]!
 }
