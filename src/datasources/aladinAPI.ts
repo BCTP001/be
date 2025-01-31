@@ -7,6 +7,7 @@ import type {
   GetBookInfoItem,
   AladinAPIRecommendBookListResponse,
   RecommendBookIsbnObject,
+  RecommendQueryType,
 } from "../types/interface/aladinAPI";
 import dotenv from "dotenv";
 
@@ -125,22 +126,8 @@ export class AladinAPI extends RESTDataSource {
     }
   };
 
-  getRecommendBookList = async (): Promise<RecommendBookIsbnObject> => {
+  getRecommendBookList = async (queryType: RecommendQueryType): Promise<RecommendBookIsbnObject> => {
     try {
-      // ItemNewAll : 신간 리스트
-      // ItemNewSpecial : 주목할 만한 신간 리스트
-      // Bestseller : 베스트셀러
-      // BlogBest : 블로거 베스트셀러
-
-      const queryTypeList: string[] = [
-        "ItemNewAll",
-        "ItemNewSpecial",
-        "Bestseller",
-        "BlogBest",
-      ];
-
-      const queryType: string = queryTypeList[Math.floor(Math.random() * 4)];
-
       const aladinAPIRecommentBookListResponse: AladinAPIRecommendBookListResponse =
         await this.get("ItemList.aspx", {
           params: {

@@ -3,7 +3,7 @@ import type {
   GetBookInfoRequest,
   GetBookInfoItem,
   RecommendBookIsbnObject,
-  RecommendBookListResponse,
+  RecommendBookListRequest
 } from "../types/interface/aladinAPI";
 import { type Resolvers } from "../types/generated";
 import { DataSourceContext } from "../context";
@@ -60,12 +60,16 @@ export const resolvers: Resolvers = {
 
     getRecommendBookList: async (
       _source: undefined,
-      __: undefined,
+      { request } : { request: RecommendBookListRequest },
       { dataSources }: DataSourceContext,
     ) => {
       try {
+        if (!request || !request.queryType) {
+          throw new Error("queryType is required");
+        }
+
         const recommendBookList: RecommendBookIsbnObject =
-          await dataSources.aladinAPI.getRecommendBookList();
+          await dataSources.aladinAPI.getRecommendBookList(request.queryType);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -75,12 +79,7 @@ export const resolvers: Resolvers = {
           bookInfoList.push(bookInfo);
         }
 
-        const response: RecommendBookListResponse = {
-          queryType: recommendBookList.queryType,
-          data: await Promise.all(bookInfoList),
-        };
-
-        return response;
+        return await Promise.all(bookInfoList);
       } catch (err) {
         console.log(err);
         throw new Error("Failed to fetch books from Aladin API");
