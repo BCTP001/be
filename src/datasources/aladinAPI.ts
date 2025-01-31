@@ -22,13 +22,15 @@ export class AladinAPI extends RESTDataSource {
     return process.env.ALADIN_API_KEY;
   }
 
-  preprocessAndParsing(
+  preprocessAndParsing = (
     responseString: string,
   ):
     | AladinAPISearchResponse
     | AladinAPIGetBookInfoResponse
-    | AladinAPIRecommendBookListResponse {
-    const cleanedString: string = responseString
+    | AladinAPIRecommendBookListResponse
+    | {} => {
+    try {
+      const cleanedString: string = responseString
       .slice(0, -1)
       .replace(/&amp;/g, "&")
       .replace(/\\(?!["\\/bfnrtu])/g, "")
@@ -38,9 +40,16 @@ export class AladinAPI extends RESTDataSource {
 
     const parsingResponse = JSON.parse(cleanedString);
     return parsingResponse;
-  }
+    } catch(err) {
+      console.log(err);
+      console.log("JS PARSING ERROR");
+      return {}
+    }
+  };
 
-  async searchBooks(searchOption: SearchOption): Promise<AladinAPIBookItem[]> {
+  searchBooks = async (
+    searchOption: SearchOption,
+  ): Promise<AladinAPIBookItem[]> => {
     try {
       const aladinAPISearchResponseString: string = await this.get(
         "ItemSearch.aspx",
@@ -68,9 +77,9 @@ export class AladinAPI extends RESTDataSource {
       console.log(error);
       throw new Error("Failed to fetch books from Aladin API");
     }
-  }
+  };
 
-  async getBookInfo(isbn13: string): Promise<GetBookInfoItem> {
+  getBookInfo = async (isbn13: string): Promise<GetBookInfoItem> => {
     try {
       const aladinAPIGetBookInfoResponseString: string = await this.get(
         "ItemLookUp.aspx",
@@ -96,9 +105,9 @@ export class AladinAPI extends RESTDataSource {
       console.log(error);
       throw new Error("Failed to fetch books from Aladin API");
     }
-  }
+  };
 
-  async getBookIsbn13List(searchOption: SearchOption): Promise<string[]> {
+  getBookIsbn13List = async (searchOption: SearchOption): Promise<string[]> => {
     try {
       const bookItemList: AladinAPIBookItem[] =
         await this.searchBooks(searchOption);
@@ -114,9 +123,9 @@ export class AladinAPI extends RESTDataSource {
       console.log(err);
       throw new Error("Failed to fetch books from Aladin API");
     }
-  }
+  };
 
-  async getRecommendBookList(): Promise<RecommendBookIsbnObject> {
+  getRecommendBookList = async (): Promise<RecommendBookIsbnObject> => {
     try {
       // ItemNewAll : 신간 리스트
       // ItemNewSpecial : 주목할 만한 신간 리스트
@@ -160,5 +169,5 @@ export class AladinAPI extends RESTDataSource {
       console.log(err);
       throw new Error("Failed to fetch books from Aladin API");
     }
-  }
+  };
 }
