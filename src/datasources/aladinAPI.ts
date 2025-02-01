@@ -1,4 +1,5 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
+import { GraphQLError } from "graphql";
 import type {
   AladinAPIBookItem,
   AladinAPISearchResponse,
@@ -42,7 +43,6 @@ export class AladinAPI extends RESTDataSource {
     const parsingResponse = JSON.parse(cleanedString);
     return parsingResponse;
     } catch(err) {
-      console.log(err);
       console.log("JS PARSING ERROR");
       return {}
     }
@@ -52,7 +52,7 @@ export class AladinAPI extends RESTDataSource {
     searchOption: SearchOption,
   ): Promise<AladinAPIBookItem[]> => {
     try {
-      const aladinAPISearchResponseString: string = await this.get(
+      const aladinAPISearchResponseString: any = await this.get(
         "ItemSearch.aspx",
         {
           params: {
@@ -73,28 +73,33 @@ export class AladinAPI extends RESTDataSource {
           aladinAPISearchResponseString,
         ) as AladinAPISearchResponse;
 
-      return aladinAPISearchResponse.item;
-    } catch (error) {
-      console.log(error);
-      throw new Error("Failed to fetch books from Aladin API");
+      return (aladinAPISearchResponse?.item) ? aladinAPISearchResponse.item : [];
+    } catch (err) {
+      throw new GraphQLError(err);
     }
   };
 
   getBookInfo = async (isbn13: string): Promise<GetBookInfoItem> => {
     try {
-      const aladinAPIGetBookInfoResponseString: string = await this.get(
+      const itemID: string = isbn13.replaceAll(" ","").replaceAll("-","");
+      console.log(itemID);
+      const aladinAPIGetBookInfoResponseString: any = await this.get(
         "ItemLookUp.aspx",
         {
           params: {
             ttbkey: this.aladinApiKey,
-            itemID: isbn13,
+            itemID: itemID,
             itemIdType:
-              isbn13.replace(" ", "").length === 13 ? "ISBN13" : "ISBN",
+              itemID.length === 13 ? "ISBN13" : "ISBN",
             cover: "Big",
             output: "JS",
           },
         },
       );
+
+      if (aladinAPIGetBookInfoResponseString instanceof Object){
+        throw new GraphQLError(aladinAPIGetBookInfoResponseString.errorMessage)
+      }
 
       const aladinAPIGetBookInfoResponse: AladinAPIGetBookInfoResponse =
         this.preprocessAndParsing(
@@ -102,9 +107,8 @@ export class AladinAPI extends RESTDataSource {
         ) as AladinAPIGetBookInfoResponse;
 
       return aladinAPIGetBookInfoResponse.item[0];
-    } catch (error) {
-      console.log(error);
-      throw new Error("Failed to fetch books from Aladin API");
+    } catch (err) {
+      throw new GraphQLError(err);
     }
   };
 
@@ -121,8 +125,7 @@ export class AladinAPI extends RESTDataSource {
 
       return response;
     } catch (err) {
-      console.log(err);
-      throw new Error("Failed to fetch books from Aladin API");
+      throw new GraphQLError(err);
     }
   };
 
@@ -153,8 +156,7 @@ export class AladinAPI extends RESTDataSource {
 
       return response;
     } catch (err) {
-      console.log(err);
-      throw new Error("Failed to fetch books from Aladin API");
+      throw new GraphQLError(err);
     }
   };
 }
