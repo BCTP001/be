@@ -7,6 +7,7 @@ import type {
 } from "../types/interface/aladinAPI";
 import { type Resolvers } from "../types/generated";
 import { DataSourceContext } from "../context";
+import { GraphQLError } from "graphql";
 
 export const resolvers: Resolvers = {
   Query: {
@@ -17,7 +18,7 @@ export const resolvers: Resolvers = {
     ) => {
       try {
         if (!searchOption || !searchOption.searchQuery) {
-          throw new Error("searchQuery is required");
+          throw new GraphQLError("searchQuery is required");
         }
 
         const bookIsbn13List: string[] =
@@ -34,7 +35,7 @@ export const resolvers: Resolvers = {
         return await Promise.all(response);
       } catch (err) {
         console.log(err);
-        throw new Error("Failed to fetch books from Aladin API");
+        throw new GraphQLError(err);
       }
     },
 
@@ -45,7 +46,7 @@ export const resolvers: Resolvers = {
     ) => {
       try {
         if (!getBookInfoRequest || !getBookInfoRequest.isbn13) {
-          throw new Error("itemId is required");
+          throw new GraphQLError("itemId is required");
         }
 
         const bookInfo: GetBookInfoItem =
@@ -54,7 +55,7 @@ export const resolvers: Resolvers = {
         return bookInfo;
       } catch (err) {
         console.log(err);
-        throw new Error("Failed to fetch books from Aladin API");
+        throw new GraphQLError(err);
       }
     },
 
@@ -65,7 +66,7 @@ export const resolvers: Resolvers = {
     ) => {
       try {
         if (!request || !request.queryType) {
-          throw new Error("queryType is required");
+          throw new GraphQLError("queryType is required");
         }
 
         const recommendBookList: RecommendBookIsbnObject =
@@ -82,7 +83,7 @@ export const resolvers: Resolvers = {
         return await Promise.all(bookInfoList);
       } catch (err) {
         console.log(err);
-        throw new Error("Failed to fetch books from Aladin API");
+        throw new GraphQLError(err);
       }
     },
   },
