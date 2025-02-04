@@ -116,10 +116,14 @@ export interface Isbn13AndIsbn {
   isbn13: string;
 }
 
-export type RecommendQueryType = "ItemNewAll" | "ItemNewSpecial" | "Bestseller" | "BlogBest";
+export type RecommendQueryType =
+  | "ItemNewAll"
+  | "ItemNewSpecial"
+  | "Bestseller"
+  | "BlogBest";
 
 export interface RecommendBookListRequest {
-  queryType: RecommendQueryType
+  queryType: RecommendQueryType;
 }
 
 export interface AladinAPIRecommendBookListResponse {

@@ -3,7 +3,7 @@ import type {
   GetBookInfoRequest,
   GetBookInfoItem,
   RecommendBookIsbnObject,
-  RecommendBookListRequest
+  RecommendBookListRequest,
 } from "../types/interface/aladinAPI";
 import { type Resolvers } from "../types/generated";
 import { DataSourceContext } from "../context";
@@ -61,7 +61,7 @@ export const resolvers: Resolvers = {
 
     getRecommendBookList: async (
       _source: undefined,
-      { request } : { request: RecommendBookListRequest },
+      { request }: { request: RecommendBookListRequest },
       { dataSources }: DataSourceContext,
     ) => {
       try {

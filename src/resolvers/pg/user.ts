@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { User, Id, Username, Name } from "../../types/interface/pg-api";
 import { type Resolvers } from "../../types/generated";
 import { DataSourceContext } from "../../context";
@@ -5,15 +6,15 @@ import { DataSourceContext } from "../../context";
 export const userResolvers: Resolvers = {
   Query: {
     user: async (
-      _,
+      _: any,
       { id }: { id: Id },
       { dataSources }: DataSourceContext,
     ): Promise<User> => {
       return await dataSources.pgAPI.findUserById(id);
     },
     users: async (
-      _,
-      __,
+      _: any,
+      __: any,
       { dataSources }: DataSourceContext,
     ): Promise<User[]> => {
       return await dataSources.pgAPI.findAllUsers();
@@ -21,7 +22,7 @@ export const userResolvers: Resolvers = {
   },
   Mutation: {
     createUser: async (
-      _,
+      _: any,
       { username, name }: { username: Username; name: Name },
       { dataSources }: DataSourceContext,
     ): Promise<User> => {

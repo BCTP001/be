@@ -30,21 +30,22 @@ export class AladinAPI extends RESTDataSource {
     | AladinAPISearchResponse
     | AladinAPIGetBookInfoResponse
     | AladinAPIRecommendBookListResponse
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     | {} => {
     try {
       const cleanedString: string = responseString
-      .slice(0, -1)
-      .replace(/&amp;/g, "&")
-      .replace(/\\(?!["\\/bfnrtu])/g, "")
-      .replace(/[\x00-\x1F\x7F]/g, (match) => {
-        return "\\u" + ("0000" + match.charCodeAt(0).toString(16)).slice(-4);
-      });
+        .slice(0, -1)
+        .replace(/&amp;/g, "&")
+        .replace(/\\(?!["\\/bfnrtu])/g, "")
+        .replace(/[\x00-\x1F\x7F]/g, (match) => {
+          return "\\u" + ("0000" + match.charCodeAt(0).toString(16)).slice(-4);
+        });
 
-    const parsingResponse = JSON.parse(cleanedString);
-    return parsingResponse;
-    } catch(err) {
+      const parsingResponse = JSON.parse(cleanedString);
+      return parsingResponse;
+    } catch {
       console.log("JS PARSING ERROR");
-      return {}
+      return {};
     }
   };
 
@@ -52,6 +53,7 @@ export class AladinAPI extends RESTDataSource {
     searchOption: SearchOption,
   ): Promise<AladinAPIBookItem[]> => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const aladinAPISearchResponseString: any = await this.get(
         "ItemSearch.aspx",
         {
@@ -73,7 +75,7 @@ export class AladinAPI extends RESTDataSource {
           aladinAPISearchResponseString,
         ) as AladinAPISearchResponse;
 
-      return (aladinAPISearchResponse?.item) ? aladinAPISearchResponse.item : [];
+      return aladinAPISearchResponse?.item ? aladinAPISearchResponse.item : [];
     } catch (err) {
       throw new GraphQLError(err);
     }
@@ -81,24 +83,24 @@ export class AladinAPI extends RESTDataSource {
 
   getBookInfo = async (isbn13: string): Promise<GetBookInfoItem> => {
     try {
-      const itemID: string = isbn13.replaceAll(" ","").replaceAll("-","");
+      const itemID: string = isbn13.replaceAll(" ", "").replaceAll("-", "");
       console.log(itemID);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const aladinAPIGetBookInfoResponseString: any = await this.get(
         "ItemLookUp.aspx",
         {
           params: {
             ttbkey: this.aladinApiKey,
             itemID: itemID,
-            itemIdType:
-              itemID.length === 13 ? "ISBN13" : "ISBN",
+            itemIdType: itemID.length === 13 ? "ISBN13" : "ISBN",
             cover: "Big",
             output: "JS",
           },
         },
       );
 
-      if (aladinAPIGetBookInfoResponseString instanceof Object){
-        throw new GraphQLError(aladinAPIGetBookInfoResponseString.errorMessage)
+      if (aladinAPIGetBookInfoResponseString instanceof Object) {
+        throw new GraphQLError(aladinAPIGetBookInfoResponseString.errorMessage);
       }
 
       const aladinAPIGetBookInfoResponse: AladinAPIGetBookInfoResponse =
@@ -129,7 +131,9 @@ export class AladinAPI extends RESTDataSource {
     }
   };
 
-  getRecommendBookList = async (queryType: RecommendQueryType): Promise<RecommendBookIsbnObject> => {
+  getRecommendBookList = async (
+    queryType: RecommendQueryType,
+  ): Promise<RecommendBookIsbnObject> => {
     try {
       const aladinAPIRecommentBookListResponse: AladinAPIRecommendBookListResponse =
         await this.get("ItemList.aspx", {
