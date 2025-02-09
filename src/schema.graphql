@@ -72,12 +72,27 @@ enum RecommendQueryType {
   BlogBest
 }
 
+# FEED
+
+type Feed {
+  isbn13: String!
+  bookName: String
+  bookDescription: String
+  bookPhotoUrl: String
+  categoryName: String
+  author: String
+  libraryName: String
+  reviewContent: String
+  rating: Int
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
   getRecommendBookList(request: recommendBookListRequest!): [GetBookInfoItem]
   user(id: ID): User
   users: [User]!
+  getFeed: [Feed]!
 }
 
 type Mutation {

@@ -38,6 +38,7 @@
     "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@nic-jennings/batched-sql-datasource": "1.0.3",
     "@babel/eslint-parser": "^7.26.5",
     "@eslint/js": "^9.18.0",
     "@graphql-codegen/cli": "^5.0.3",

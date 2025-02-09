@@ -9,7 +9,7 @@ import { type Resolvers } from "../types/generated";
 import { DataSourceContext } from "../context";
 import { GraphQLError } from "graphql";
 
-export const resolvers: Resolvers = {
+export const aladinAPIResolver: Resolvers = {
   Query: {
     searchBooksAndGetBookInfo: async (
       _source: undefined,
@@ -75,9 +75,7 @@ export const resolvers: Resolvers = {
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
         for (const i of recommendBookList.isbn13List) {
-          const bookInfo: Promise<GetBookInfoItem> =
-            dataSources.aladinAPI.getBookInfo(i);
-          bookInfoList.push(bookInfo);
+          bookInfoList.push(dataSources.aladinAPI.getBookInfo(i));
         }
 
         return await Promise.all(bookInfoList);

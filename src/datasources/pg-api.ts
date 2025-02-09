@@ -1,5 +1,5 @@
 import { BatchedSQLDataSource } from "@nic-jennings/sql-datasource";
-import { User } from "../types/interface/pg-api";
+import { User, PgFeedObject } from "../types/interface/pg-api";
 
 export class PGAPI extends BatchedSQLDataSource {
   insertUser = async (username: string, name: string): Promise<User> => {
@@ -20,5 +20,22 @@ export class PGAPI extends BatchedSQLDataSource {
       .from("useruser")
       .where({ id });
     return users[0];
+  };
+
+  getFeed = async (): Promise<PgFeedObject[]> => {
+    const feedRows = await this.db.query
+      .select(
+        "b.isbn AS isbn13",
+        "l.name AS libraryName",
+        "r.content AS reviewContent",
+        "r.rating AS rating",
+      )
+      .from({ b: "book" })
+      .join({ r: "review" }, "b.isbn", "r.isbn")
+      .join({ p: "provides" }, "b.isbn", "p.isbn")
+      .join({ l: "library" }, "p.libraryId", "l.id")
+      .orderByRaw("random()")
+      .limit(5);
+    return feedRows;
   };
 }
