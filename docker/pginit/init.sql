@@ -261,4 +261,18 @@ REFERENCES "book" (
 );
 
 /* Temporary user for testing */
-INSERT INTO useruser(username, name) values('kdh', 'Kim Dohyeon');
+INSERT INTO useruser("username", "name") values('kdh', 'Kim Dohyeon') RETURNING id;
+
+INSERT INTO book("isbn") values('9788928600915');
+INSERT INTO book("isbn") values('9791191583793');
+INSERT INTO book("isbn") values('9791189327156');
+
+INSERT INTO library("name") values('전투모의지원중대') RETURNING id;
+
+INSERT INTO provides("isbn", "libraryId") values('9788928600915', 1);
+INSERT INTO provides("isbn", "libraryId") values('9791191583793', 1);
+INSERT INTO provides("isbn", "libraryId") values('9791189327156', 1);
+
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9788928600915', 4, '"4 - 3" 이것은 단순한 수식이 아니다. 가슴이 철렁내려앉고, 머리속이 하얗게 질려버리는 충격적인 사건후에 홀로 남은 바버라의 이야기인 것이다.');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791191583793', 4, '새처럼 지구의 이곳저곳을 여행하던 저자가, 새를 위해 지구를 위해 여행을 자제하기로 마음먹게 되는 과정이 흥미로웠다. 닮고 싶은 태도, 닮고 싶은 작가다.');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791189327156', 4, '그어 놓은 선 저 너머를 보려고 노력하는 것. 그 자체가 삶의 소중함과 삶을 살아가는 지침이 될 수 있다는 것.');
