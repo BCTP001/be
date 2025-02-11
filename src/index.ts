@@ -4,6 +4,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { aladinAPIResolver } from "./resolvers/aladinAPIResolver";
 import { pgResolvers } from "./resolvers/pg";
 import { feedResolvers } from "./resolvers/pg/feed";
+import { shelfResolver } from "./resolvers/pg/shelf";
 import { AladinAPI } from "./datasources/aladinAPI";
 import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
@@ -18,7 +19,12 @@ const typeDefs: DocumentNode = gql(
   }),
 );
 
-const resolvers = [aladinAPIResolver, pgResolvers, feedResolvers];
+const resolvers = [
+  aladinAPIResolver,
+  pgResolvers,
+  feedResolvers,
+  shelfResolver,
+];
 
 const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({

@@ -26,3 +26,18 @@ export interface PgFeedObject {
   reviewContent: string;
   rating: number;
 }
+
+export interface ContainBookInShelfRequest {
+  isbn13List: string[];
+  userId: number;
+}
+
+export interface ContainBookInShelfResponse {
+  msg: string;
+  shelfName: string;
+  isbn13List: string[];
+}
+
+export interface ShelfId {
+  shelfId: number;
+}

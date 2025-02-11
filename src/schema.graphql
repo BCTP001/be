@@ -86,6 +86,23 @@ type Feed {
   rating: Int
 }
 
+# SHELF
+
+input ContainBookInShelfRequest {
+  isbn13List: [String]
+  userId: Int
+}
+
+type ContainBookInShelfResponse {
+  msg: String
+  shelfName: String
+  isbn13List: [String]
+}
+
+input GetBooksInShelfRequest {
+  shelfId: Int
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
@@ -93,10 +110,12 @@ type Query {
   user(id: ID): User
   users: [User]!
   getFeed: [Feed]!
+  getBooksInShelf(request: GetBooksInShelfRequest): [GetBookInfoItem]
 }
 
 type Mutation {
   createUser(username: String!, name: String!): User
+  containBookInShelf(request: ContainBookInShelfRequest): ContainBookInShelfResponse
 }
 
 type User {

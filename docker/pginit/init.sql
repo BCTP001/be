@@ -263,6 +263,8 @@ REFERENCES "book" (
 /* Temporary user for testing */
 INSERT INTO useruser("username", "name") values('kdh', 'Kim Dohyeon') RETURNING id;
 
+INSERT INTO shelf("name", "userId") values('kdh의 책장', 1);
+
 INSERT INTO book("isbn") values('9788928600915');
 INSERT INTO book("isbn") values('9791191583793');
 INSERT INTO book("isbn") values('9791189327156');

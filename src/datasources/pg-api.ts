@@ -38,4 +38,50 @@ export class PGAPI extends BatchedSQLDataSource {
       .limit(5);
     return feedRows;
   };
+
+  isBookExists = async (isbn13: string): Promise<boolean> => {
+    return (await this.db.query
+      .select("*")
+      .from("book")
+      .where({ isbn: isbn13 }))
+      ? true
+      : false;
+  };
+
+  getExistingBooks = async (isbn13List: string[]): Promise<string[]> => {
+    const existingBooks = await this.db.query
+      .select("isbn")
+      .from("book")
+      .whereIn("isbn", isbn13List);
+
+    return existingBooks.map((book) => book.isbn);
+  };
+
+  insertBook = async (isbn: string): Promise<void> => {
+    await this.db.write.insert({ isbn }).into("book");
+  };
+
+  insertContains = async (userId: number, isbn: string): Promise<string> => {
+    const shelfRow = await this.db.query
+      .select("name", "id")
+      .from("shelf")
+      .where({ userId });
+
+    await this.db.write
+      .insert({ shelfId: shelfRow[0].id, isbn })
+      .into("contains")
+      .onConflict(["shelfId", "isbn"])
+      .ignore();
+
+    return shelfRow[0].name;
+  };
+
+  getBooksInShelf = async (shelfId: number): Promise<{ isbn: string }[]> => {
+    const containsRow = await this.db.query
+      .select("isbn")
+      .from("contains")
+      .where({ shelfId });
+
+    return containsRow;
+  };
 }
