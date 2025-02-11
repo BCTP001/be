@@ -26,11 +26,9 @@ export const aladinAPIResolver: Resolvers = {
 
         const response: Promise<GetBookInfoItem>[] = [];
 
-        for (const i of bookIsbn13List) {
-          const bookInfo: Promise<GetBookInfoItem> =
-            dataSources.aladinAPI.getBookInfo(i);
-          response.push(bookInfo);
-        }
+        bookIsbn13List.map((value) => {
+          response.push(dataSources.aladinAPI.getBookInfo(value));
+        });
 
         return await Promise.all(response);
       } catch (err) {
