@@ -111,15 +111,43 @@ type Query {
   users: [User]!
   getFeed: [Feed]!
   getBooksInShelf(request: GetBooksInShelfRequest): [GetBookInfoItem]
+  reviews(isbn: String!): [Review!]!
+  review(id: ID!): Review
 }
 
 type Mutation {
   createUser(username: String!, name: String!): User
   containBookInShelf(request: ContainBookInShelfRequest): ContainBookInShelfResponse
+  createReview(createReviewArgs: CreateReviewArgs!): ID
+  updateReview(updateReviewArgs: UpdateReviewArgs!): ID
+  deleteReview(id: ID!): ID
 }
 
 type User {
   id: ID!
   username: String!
   name: String!
+}
+
+# FEATURE/REVIEW
+
+type Review {
+  id: ID!
+  userId: ID!
+  isbn: String!
+  rating: Int!
+  content: String
+}
+
+input CreateReviewArgs {
+  userId: ID!
+  isbn: String!
+  rating: Int!
+  content: String
+}
+
+input UpdateReviewArgs {
+  id: ID!
+  rating: Int!
+  content: String
 }

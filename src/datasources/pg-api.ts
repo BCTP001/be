@@ -1,8 +1,18 @@
 import { BatchedSQLDataSource } from "@nic-jennings/sql-datasource";
-import { User, PgFeedObject } from "../types/interface/pg-api";
+import {
+  User,
+  Username,
+  Name,
+  Isbn,
+  Review,
+  Id,
+  InsertReviewArgs,
+  UpdateReviewArgs,
+  PgFeedObject,
+} from "../types/interface/pg-api";
 
 export class PGAPI extends BatchedSQLDataSource {
-  insertUser = async (username: string, name: string): Promise<User> => {
+  insertUser = async (username: Username, name: Name): Promise<User> => {
     const createdUsers = await this.db.write
       .insert({ username, name })
       .into("useruser")
@@ -14,7 +24,7 @@ export class PGAPI extends BatchedSQLDataSource {
     return await this.db.query.select("*").from("useruser");
   };
 
-  findUserById = async (id: string): Promise<User> => {
+  findUserById = async (id: Id): Promise<User> => {
     const users = await this.db.query
       .select("*")
       .from("useruser")
@@ -83,5 +93,43 @@ export class PGAPI extends BatchedSQLDataSource {
       .where({ shelfId });
 
     return containsRow;
+  };
+
+  searchReviewsByBook = async (isbn: Isbn): Promise<Review[]> => {
+    return await this.db.query.select("*").from("review").where({ isbn });
+  };
+
+  lookupReview = async (id: Id): Promise<Review> => {
+    const reviews = await this.db.query
+      .select("*")
+      .from("review")
+      .where({ id });
+    return reviews[0];
+  };
+
+  insertReview = async (insertReviewArgs: InsertReviewArgs) => {
+    const newReviews = await this.db.write
+      .insert(insertReviewArgs)
+      .into("review")
+      .returning(["id"]);
+    return newReviews[0].id;
+  };
+
+  updateReview = async (updateReviewArgs: UpdateReviewArgs) => {
+    const { id, ...updatedInfo } = updateReviewArgs;
+    const updatedReviews = await this.db.write
+      .table("review")
+      .where({ id })
+      .update(updatedInfo, ["id"]);
+    return updatedReviews[0].id;
+  };
+
+  deleteReview = async (id: Id) => {
+    const deletedReviews = await this.db.write
+      .table("review")
+      .where("id", id)
+      .del()
+      .returning(["id"]);
+    return deletedReviews[0].id;
   };
 }
