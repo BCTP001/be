@@ -8,7 +8,7 @@ import type {
 import { type Resolvers } from "../../types/generated";
 import { DataSourceContext } from "../../context";
 
-export const userResolvers: Resolvers = {
+export const reviewResolvers: Resolvers = {
   Query: {
     reviews: async (
       _,
