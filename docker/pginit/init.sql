@@ -15,10 +15,19 @@ CREATE TABLE "useruser" (
 );
 
 CREATE TABLE "review" (
-	"userId"	serial		NOT NULL,
-	"isbn"	varchar(13)		NOT NULL,
+	"id"	serial		NOT NULL,
 	"rating"	int		NOT NULL,
-	"content"	varchar(500)		NULL
+	"content"	varchar(500)		NULL,
+	"userId"	serial		NOT NULL,
+	"isbn"	varchar(13)		NOT NULL
+);
+
+CREATE TABLE "article" (
+	"id"	serial		NOT NULL,
+	"title"	varchar(100)		NOT NULL,
+	"content"	varchar(3000)		NOT NULL,
+	"userId"	serial		NOT NULL,
+	"isbn"	varchar(13)		NOT NULL
 );
 
 CREATE TABLE "library" (
@@ -68,14 +77,6 @@ CREATE TABLE "likes" (
 	"isbn"	varchar(13)		NOT NULL
 );
 
-CREATE TABLE "article" (
-	"id"	serial		NOT NULL,
-	"title"	varchar(100)		NOT NULL,
-	"content"	varchar(3000)		NOT NULL,
-	"userId"	serial		NOT NULL,
-	"isbn"	varchar(13)		NOT NULL
-);
-
 ALTER TABLE "requests" ADD CONSTRAINT "PK_REQUESTS" PRIMARY KEY (
 	"id"
 );
@@ -85,8 +86,11 @@ ALTER TABLE "useruser" ADD CONSTRAINT "PK_USERUSER" PRIMARY KEY (
 );
 
 ALTER TABLE "review" ADD CONSTRAINT "PK_REVIEW" PRIMARY KEY (
-	"userId",
-	"isbn"
+	"id"
+);
+
+ALTER TABLE "article" ADD CONSTRAINT "PK_ARTICLE" PRIMARY KEY (
+	"id"
 );
 
 ALTER TABLE "library" ADD CONSTRAINT "PK_LIBRARY" PRIMARY KEY (
@@ -130,10 +134,6 @@ ALTER TABLE "likes" ADD CONSTRAINT "PK_LIKES" PRIMARY KEY (
 	"isbn"
 );
 
-ALTER TABLE "article" ADD CONSTRAINT "PK_ARTICLE" PRIMARY KEY (
-	"id"
-);
-
 ALTER TABLE "requests" ADD CONSTRAINT "FK_book_TO_requests_1" FOREIGN KEY (
 	"isbn"
 )
@@ -156,6 +156,20 @@ REFERENCES "useruser" (
 );
 
 ALTER TABLE "review" ADD CONSTRAINT "FK_book_TO_review_1" FOREIGN KEY (
+	"isbn"
+)
+REFERENCES "book" (
+	"isbn"
+);
+
+ALTER TABLE "article" ADD CONSTRAINT "FK_useruser_TO_article_1" FOREIGN KEY (
+	"userId"
+)
+REFERENCES "useruser" (
+	"id"
+);
+
+ALTER TABLE "article" ADD CONSTRAINT "FK_book_TO_article_1" FOREIGN KEY (
 	"isbn"
 )
 REFERENCES "book" (
@@ -240,20 +254,6 @@ REFERENCES "useruser" (
 );
 
 ALTER TABLE "likes" ADD CONSTRAINT "FK_book_TO_likes_1" FOREIGN KEY (
-	"isbn"
-)
-REFERENCES "book" (
-	"isbn"
-);
-
-ALTER TABLE "article" ADD CONSTRAINT "FK_useruser_TO_article_1" FOREIGN KEY (
-	"userId"
-)
-REFERENCES "useruser" (
-	"id"
-);
-
-ALTER TABLE "article" ADD CONSTRAINT "FK_book_TO_article_1" FOREIGN KEY (
 	"isbn"
 )
 REFERENCES "book" (
