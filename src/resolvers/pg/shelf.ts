@@ -3,9 +3,9 @@ import { GraphQLError } from "graphql";
 import { DataSourceContext } from "../../context";
 import { type Resolvers } from "../../types/generated";
 import type {
-  ContainBookInShelfRequest,
-  ContainBookInShelfResponse,
-  ShelfId,
+  UpdateShelfRequest,
+  UpdateShelfResponse,
+  UserId,
 } from "../../types/interface/pg-api";
 import { type GetBookInfoItem } from "../../types/interface/aladinAPI";
 
@@ -13,12 +13,12 @@ export const shelfResolver: Resolvers = {
   Query: {
     getBooksInShelf: async (
       _: any,
-      { request }: { request: ShelfId },
+      { request }: { request: UserId },
       { dataSources }: DataSourceContext,
     ): Promise<GetBookInfoItem[]> => {
       try {
         const isbn13List: { isbn: string }[] =
-          await dataSources.pgAPI.getBooksInShelf(request.shelfId);
+          await dataSources.pgAPI.getBooksInShelf(request.userId);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -33,17 +33,19 @@ export const shelfResolver: Resolvers = {
     },
   },
   Mutation: {
-    containBookInShelf: async (
+    updateShelf: async (
       _: any,
-      { request }: { request: ContainBookInShelfRequest },
+      { request }: { request: UpdateShelfRequest },
       { dataSources }: DataSourceContext,
-    ): Promise<ContainBookInShelfResponse> => {
+    ): Promise<UpdateShelfResponse> => {
       try {
-        const existingBooks = await dataSources.pgAPI.getExistingBooks(
-          request.isbn13List,
-        );
+        console.log(request);
+        const existingBooks = await dataSources.pgAPI.getExistingBooks([
+          ...request.containList,
+          ...request.excludeList,
+        ]);
 
-        const newBooks = request.isbn13List.filter(
+        const newBooks = request.containList.filter(
           (isbn13) => !existingBooks.includes(isbn13),
         );
 
@@ -52,15 +54,24 @@ export const shelfResolver: Resolvers = {
         );
 
         const shelfNames = await Promise.all(
-          request.isbn13List.map((isbn13) =>
+          request.containList.map((isbn13) =>
             dataSources.pgAPI.insertContains(request.userId, isbn13),
           ),
         );
 
+        const removableBooks = request.excludeList.filter((isbn13) =>
+          existingBooks.includes(isbn13),
+        );
+
+        await Promise.all(
+          removableBooks.map((isbn13) =>
+            dataSources.pgAPI.deleteContains(isbn13),
+          ),
+        );
+
         return {
-          msg: "Success!!",
+          msg: "Shelf Update Success!!",
           shelfName: shelfNames[0],
-          isbn13List: request.isbn13List,
         };
       } catch (err) {
         throw new GraphQLError(err);

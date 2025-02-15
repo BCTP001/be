@@ -76,12 +76,17 @@ export class PGAPI extends BatchedSQLDataSource {
     return shelfRow[0].name;
   };
 
-  getBooksInShelf = async (shelfId: number): Promise<{ isbn: string }[]> => {
-    const containsRow = await this.db.query
-      .select("isbn")
-      .from("contains")
-      .where({ shelfId });
+  deleteContains = async (isbn: string): Promise<void> => {
+    await this.db.write.from("contains").where({ isbn }).del();
+  };
 
-    return containsRow;
+  getBooksInShelf = async (userId: number): Promise<{ isbn: string }[]> => {
+    const containsRow = await this.db.query
+      .select("c.isbn")
+      .from({ s: "shelf" })
+      .join({ c: "contains" }, "s.id", "c.shelfId")
+      .where("s.userId", userId);
+
+    return containsRow.map((row) => ({ isbn: row.isbn }));
   };
 }
