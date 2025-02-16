@@ -39,7 +39,6 @@ export const shelfResolver: Resolvers = {
       { dataSources }: DataSourceContext,
     ): Promise<UpdateShelfResponse> => {
       try {
-        console.log(request);
         const existingBooks = await dataSources.pgAPI.getExistingBooks([
           ...request.containList,
           ...request.excludeList,

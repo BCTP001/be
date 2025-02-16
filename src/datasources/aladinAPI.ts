@@ -84,7 +84,6 @@ export class AladinAPI extends RESTDataSource {
   getBookInfo = async (isbn13: string): Promise<GetBookInfoItem> => {
     try {
       const itemID: string = isbn13.replaceAll(" ", "").replaceAll("-", "");
-      console.log(itemID);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const aladinAPIGetBookInfoResponseString: any = await this.get(
         "ItemLookUp.aspx",
