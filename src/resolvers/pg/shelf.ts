@@ -9,7 +9,7 @@ import type {
 } from "../../types/interface/pg-api";
 import { type GetBookInfoItem } from "../../types/interface/aladinAPI";
 
-export const shelfResolver: Resolvers = {
+export const shelfResolvers: Resolvers = {
   Query: {
     getBooksInShelf: async (
       _: any,
@@ -52,9 +52,11 @@ export const shelfResolver: Resolvers = {
           newBooks.map((isbn13) => dataSources.pgAPI.insertBook(isbn13)),
         );
 
-        const shelfNames = await Promise.all(
+        const shelfInfo = await dataSources.pgAPI.getShelfInfo(request.userId);
+
+        await Promise.all(
           request.containList.map((isbn13) =>
-            dataSources.pgAPI.insertContains(request.userId, isbn13),
+            dataSources.pgAPI.insertContains(shelfInfo.id, isbn13),
           ),
         );
 
@@ -70,7 +72,7 @@ export const shelfResolver: Resolvers = {
 
         return {
           msg: "Shelf Update Success!!",
-          shelfName: shelfNames[0],
+          shelfName: shelfInfo.name,
         };
       } catch (err) {
         throw new GraphQLError(err);

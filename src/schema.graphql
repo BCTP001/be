@@ -104,20 +104,20 @@ type UpdateShelfResponse {
 }
 
 type Query {
-  searchBooksAndGetBookInfo(searchOption: SearchOption): [GetBookInfoItem]
-  getBookInfo(getBookInfoRequest: GetBookInfoRequest): GetBookInfoItem
+  searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
+  getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
   getRecommendBookList(request: recommendBookListRequest!): [GetBookInfoItem]
   user(id: ID): User
   users: [User]!
   getFeed: [Feed]!
-  getBooksInShelf(request: GetBooksInShelfRequest): [GetBookInfoItem]
+  getBooksInShelf(request: GetBooksInShelfRequest!): [GetBookInfoItem]
   reviews(isbn: String!): [Review!]!
   review(id: ID!): Review
 }
 
 type Mutation {
   createUser(username: String!, name: String!): User
-  updateShelf(request: UpdateShelfRequest): UpdateShelfResponse
+  updateShelf(request: UpdateShelfRequest!): UpdateShelfResponse
   createReview(createReviewArgs: CreateReviewArgs!): ID
   updateReview(updateReviewArgs: UpdateReviewArgs!): ID
   deleteReview(id: ID!): ID

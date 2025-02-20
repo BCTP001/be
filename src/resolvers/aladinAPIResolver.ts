@@ -70,11 +70,10 @@ export const aladinAPIResolver: Resolvers = {
         const recommendBookList: RecommendBookIsbnObject =
           await dataSources.aladinAPI.getRecommendBookList(request.queryType);
 
-        const bookInfoList: Promise<GetBookInfoItem>[] = [];
-
-        for (const i of recommendBookList.isbn13List) {
-          bookInfoList.push(dataSources.aladinAPI.getBookInfo(i));
-        }
+        const bookInfoList: Promise<GetBookInfoItem>[] =
+          recommendBookList.isbn13List.map((isbn) =>
+            dataSources.aladinAPI.getBookInfo(isbn),
+          );
 
         return await Promise.all(bookInfoList);
       } catch (err) {
