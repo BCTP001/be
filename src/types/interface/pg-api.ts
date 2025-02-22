@@ -1,6 +1,8 @@
 export type Id = string;
 export type Username = string;
 export type Name = string;
+export type Password = string;
+export type HashedPw = string;
 
 export interface User {
   id: Id;

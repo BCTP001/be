@@ -6,12 +6,39 @@ import {
   Isbn,
   Review,
   Id,
+  HashedPw,
   InsertReviewArgs,
   UpdateReviewArgs,
   PgFeedObject,
 } from "../types/interface/pg-api";
+import { GraphQLError } from "graphql";
 
 export class PGAPI extends BatchedSQLDataSource {
+  createUser = async (
+    name: Name,
+    username: Username,
+    hashedPw: HashedPw,
+  ): Promise<User> => {
+    let createdUsers: User[];
+    try {
+      createdUsers = await this.db.write
+        .insert({ name, username, hashedPw })
+        .into("useruser")
+        .returning(["id", "username", "name"]);
+    } catch (e) {
+      if (e.detail == `Key (username)=(${username}) already exists.`) {
+        throw new GraphQLError(`Username "${username}" already exists.`, {
+          extensions: {
+            code: "FORBIDDEN",
+          },
+        });
+      } else {
+        throw e;
+      }
+    }
+    return createdUsers[0];
+  };
+
   insertUser = async (username: Username, name: Name): Promise<User> => {
     const createdUsers = await this.db.write
       .insert({ username, name })

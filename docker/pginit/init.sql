@@ -8,10 +8,11 @@ CREATE TABLE "requests" (
 
 CREATE TABLE "useruser" (
 	"id"	serial		NOT NULL,
-	"username"	varchar(40)		NOT NULL,
+	"username"	varchar(40) UNIQUE		NOT NULL,
 	"name"	varchar(50)		NOT NULL,
 	"profilePic"	varchar(100)		NULL,
-	"bio"	varchar(80)		NULL
+	"bio"	varchar(80)		NULL,
+	"hashedPw"	text		NOT NULL
 );
 
 CREATE TABLE "review" (
@@ -272,7 +273,7 @@ REFERENCES "book" (
 );
 
 /* Temporary user for testing */
-INSERT INTO useruser("username", "name") values('kdh', 'Kim Dohyeon') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '1234567890') RETURNING id;
 
 INSERT INTO shelf("name", "userId") values('kdh의 책장', 1);
 
