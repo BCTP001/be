@@ -6,6 +6,10 @@ export const hashPw = async (password: string) => {
   return hashedPw;
 };
 
+export const checkPw = async (password: string, hashedPw: string) => {
+  return await bcrypt.compare(password, hashedPw);
+};
+
 export const isPasswordSecure = (password: string) => {
   // TODO: Check whether the password meets the security requirements
   return password.length >= 6;

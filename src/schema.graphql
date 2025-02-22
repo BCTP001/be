@@ -122,6 +122,11 @@ type Mutation {
   updateReview(updateReviewArgs: UpdateReviewArgs!): ID
   deleteReview(id: ID!): ID
   signUp(name: String!, username: String!, password: String!): User
+  signIn(username: String!, password: String!): WelcomePackage
+}
+
+type WelcomePackage {
+  signedInAs: User!
 }
 
 type User {

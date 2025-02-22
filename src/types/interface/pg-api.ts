@@ -10,6 +10,17 @@ export interface User {
   name: Name;
 }
 
+export interface Useruser {
+  id: Id;
+  username: Username;
+  hashedPw: HashedPw;
+  name: Name;
+}
+
+export interface WelcomePackage {
+  signedInAs: User;
+}
+
 export interface Feed {
   isbn13: string;
   bookName: string;

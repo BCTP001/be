@@ -10,8 +10,12 @@ import {
   InsertReviewArgs,
   UpdateReviewArgs,
   PgFeedObject,
+  Password,
+  WelcomePackage,
+  Useruser,
 } from "../types/interface/pg-api";
 import { GraphQLError } from "graphql";
+import { checkPw } from "../utils";
 
 export class PGAPI extends BatchedSQLDataSource {
   createUser = async (
@@ -37,6 +41,35 @@ export class PGAPI extends BatchedSQLDataSource {
       }
     }
     return createdUsers[0];
+  };
+
+  getWelcomePackage = async (
+    username: Username,
+    password: Password,
+  ): Promise<WelcomePackage> => {
+    const users: Useruser[] = await this.db
+      .query("useruser")
+      .select("*")
+      .where({ username });
+    if (users.length === 0) {
+      throw new GraphQLError(`Username "${username}" doesn't exist.`, {
+        extensions: {
+          code: "FORBIDDEN",
+        },
+      });
+    }
+    const user = users[0];
+    const hashedPw = user.hashedPw;
+    if (!(await checkPw(password, hashedPw))) {
+      throw new GraphQLError(`Wrong password for username "${username}".`, {
+        extensions: {
+          code: "UNAUTHENTICATED",
+        },
+      });
+    }
+    return {
+      signedInAs: user,
+    };
   };
 
   insertUser = async (username: Username, name: Name): Promise<User> => {
