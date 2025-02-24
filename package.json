@@ -38,13 +38,14 @@
     "pg": "^8.13.1"
   },
   "devDependencies": {
-    "@nic-jennings/batched-sql-datasource": "1.0.3",
     "@babel/eslint-parser": "^7.26.5",
     "@eslint/js": "^9.18.0",
     "@graphql-codegen/cli": "^5.0.3",
     "@graphql-codegen/typescript": "^4.1.2",
     "@graphql-codegen/typescript-resolvers": "^4.4.1",
+    "@nic-jennings/batched-sql-datasource": "1.0.3",
     "@types/eslint-config-prettier": "^6.11.3",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.10.6",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",

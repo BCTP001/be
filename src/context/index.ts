@@ -6,4 +6,5 @@ export type DataSourceContext = {
     aladinAPI: AladinAPI;
     pgAPI: PGAPI;
   };
+  userId: number;
 };

@@ -29,3 +29,7 @@ node_modules/
 
 # postgresql data
 docker/local.pgdata/
+
+# RSA KEY
+private.key
+public.key
