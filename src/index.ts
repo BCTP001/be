@@ -29,11 +29,14 @@ const startApolloServer = async () => {
     listen: { port: 4000 },
     context: async () => {
       const { cache } = server;
+      // TODO: Retrieve user ID from the header
+      const userId: string = null;
       return {
         dataSources: {
           aladinAPI: new AladinAPI(),
           pgAPI: new PGAPI({ cache, knexConfig }),
         },
+        userId,
       };
     },
   });
