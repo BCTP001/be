@@ -1,3 +1,4 @@
+import { IncomingMessage, ServerResponse } from "http";
 import { AladinAPI } from "../datasources/aladinAPI";
 import { PGAPI } from "../datasources/pg-api";
 
@@ -7,4 +8,5 @@ export type DataSourceContext = {
     pgAPI: PGAPI;
   };
   userId: string;
+  res: ServerResponse<IncomingMessage>;
 };

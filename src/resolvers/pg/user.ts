@@ -7,6 +7,7 @@ import type {
   Name,
   WelcomePackage,
 } from "../../types/interface/pg-api";
+import { signJWT } from "../../utils";
 import { type Resolvers } from "../../types/generated";
 import { DataSourceContext } from "../../context";
 import { hashPw, isPasswordSecure } from "../../utils";
@@ -67,7 +68,7 @@ export const userResolvers: Resolvers = {
     signIn: async (
       _: any,
       { username, password }: { username: Username; password: Password },
-      { userId, dataSources }: DataSourceContext,
+      { userId, dataSources, res }: DataSourceContext,
     ): Promise<WelcomePackage> => {
       if (userId !== null) {
         throw new GraphQLError("You cannot sign in when you're signed in.", {
@@ -76,7 +77,13 @@ export const userResolvers: Resolvers = {
           },
         });
       }
-      return await dataSources.pgAPI.getWelcomePackage(username, password);
+
+      const welcomePackage = await dataSources.pgAPI.getWelcomePackage(
+        username,
+        password,
+      );
+      res.setHeader("Authorization", signJWT(welcomePackage.signedInAs.id));
+      return welcomePackage;
     },
   },
 };
