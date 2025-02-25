@@ -10,6 +10,7 @@ import { gql } from "graphql-tag";
 import { DocumentNode, GraphQLError } from "graphql";
 import { PGAPI } from "./datasources/pg-api";
 import knexConfig from "./knex";
+import Cookies from "cookies";
 import { signJWT, verifyJWT } from "./utils";
 
 const typeDefs: DocumentNode = gql(
@@ -33,12 +34,17 @@ const startApolloServer = async () => {
 
       let userId: string = null;
 
+      const cookies = new Cookies(req, res);
+
       if (req.headers.authorization) {
-        const data = verifyJWT(req.headers.authorization);
+        const data = verifyJWT(cookies.get("token"));
 
         if (!data.isNotExp) {
-          const newToken = signJWT(data.userId);
-          res.setHeader("Authorization", newToken);
+          cookies.set("token", signJWT(data.userId), {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+          });
         }
 
         userId = data.userId;
@@ -56,7 +62,7 @@ const startApolloServer = async () => {
           pgAPI: new PGAPI({ cache, knexConfig }),
         },
         userId,
-        res,
+        cookies,
       };
     },
   });

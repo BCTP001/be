@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "http";
+import Cookies from "cookies";
 import { AladinAPI } from "../datasources/aladinAPI";
 import { PGAPI } from "../datasources/pg-api";
 
@@ -8,5 +8,5 @@ export type DataSourceContext = {
     pgAPI: PGAPI;
   };
   userId: string;
-  res: ServerResponse<IncomingMessage>;
+  cookies: Cookies;
 };

@@ -68,7 +68,7 @@ export const userResolvers: Resolvers = {
     signIn: async (
       _: any,
       { username, password }: { username: Username; password: Password },
-      { userId, dataSources, res }: DataSourceContext,
+      { userId, dataSources, cookies }: DataSourceContext,
     ): Promise<WelcomePackage> => {
       if (userId !== null) {
         throw new GraphQLError("You cannot sign in when you're signed in.", {
@@ -82,7 +82,13 @@ export const userResolvers: Resolvers = {
         username,
         password,
       );
-      res.setHeader("Authorization", signJWT(welcomePackage.signedInAs.id));
+
+      cookies.set("token", signJWT(welcomePackage.signedInAs.id), {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
       return welcomePackage;
     },
   },
