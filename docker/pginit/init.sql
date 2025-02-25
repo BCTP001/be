@@ -8,10 +8,11 @@ CREATE TABLE "requests" (
 
 CREATE TABLE "useruser" (
 	"id"	serial		NOT NULL,
-	"username"	varchar(40)		NOT NULL,
+	"username"	varchar(40) UNIQUE		NOT NULL,
 	"name"	varchar(50)		NOT NULL,
 	"profilePic"	varchar(100)		NULL,
-	"bio"	varchar(80)		NULL
+	"bio"	varchar(80)		NULL,
+	"hashedPw"	text		NOT NULL
 );
 
 CREATE TABLE "review" (
@@ -47,7 +48,18 @@ CREATE TABLE "affiliates" (
 );
 
 CREATE TABLE "book" (
-	"isbn"	varchar(13)		NOT NULL
+	"isbn"	varchar(13)		NOT NULL,
+	"title"	text		NULL,
+	"link"	text		NULL,
+	"author"	text		NULL,
+	"pubDate"	date		NULL,
+	"description"	text		NULL,
+	"creator"	text		NULL,
+	"cover"	text		NULL,
+	"categoryId"	text		NULL,
+	"categoryName"	text		NULL,
+	"publisher"	text		NULL,
+	"customerReviewRank"	numeric(3, 1)		NULL
 );
 
 CREATE TABLE "shelf" (
@@ -261,41 +273,92 @@ REFERENCES "book" (
 );
 
 /* Temporary user for testing */
-INSERT INTO useruser("username", "name") values('kdh', 'Kim Dohyeon') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '1234567890') RETURNING id;
 
 INSERT INTO shelf("name", "userId") values('kdh의 책장', 1);
 
-INSERT INTO book("isbn") values('9788928600915');
-INSERT INTO book("isbn") values('9791191583793');
-INSERT INTO book("isbn") values('9791189327156');
-INSERT INTO book("isbn") values('9791136798763');
-INSERT INTO book("isbn") values('9791142308079');
-INSERT INTO book("isbn") values('9791136799289');
-INSERT INTO book("isbn") values('9791173570025');
-INSERT INTO book("isbn") values('9791157064151');
-INSERT INTO book("isbn") values('9791187119845');
-INSERT INTO book("isbn") values('9788936434120');
+CREATE TABLE booktemp(
+	"id"	text	NULL,
+	"title"	text		NULL,
+	"link"	text		NULL,
+	"author"	text		NULL,
+	"pubDate"	date		NULL,
+	"description"	text		NULL,
+	"creator"	text		NULL,
+	"isbn"	varchar(13)		NULL,
+	"isbn13"	varchar(13)		NULL,
+	"cover"	text		NULL,
+	"categoryId"	text		NULL,
+	"categoryName"	text		NULL,
+	"publisher"	text		NULL,
+	"customerReviewRank"	numeric(3, 1)		NULL
+);
+
+COPY booktemp(
+	"id",
+	"title",
+	"link",
+	"author",
+	"pubDate",
+	"description",
+	"creator",
+	"isbn",
+	"isbn13",
+	"cover",
+	"categoryId",
+	"categoryName",
+	"publisher",
+	"customerReviewRank"
+)
+FROM '/init-data/booktemp.csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO book
+SELECT DISTINCT ON ("coalesced")
+	COALESCE("isbn13", "isbn") AS "coalesced",
+	"title",
+	"link",
+	"author",
+	"pubDate",
+	"description",
+	"creator",
+	"cover",
+	"categoryId",
+	"categoryName",
+	"publisher",
+	"customerReviewRank"
+FROM booktemp
+WHERE
+	"isbn13" IS NOT NULL
+	OR
+	(
+		"isbn" IS NOT NULL
+		AND
+		"isbn" ~ '^[0-9]+$'
+	)
+;
 
 INSERT INTO library("name") values('전투모의지원중대') RETURNING id;
 
-INSERT INTO provides("isbn", "libraryId") values('9788928600915', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791191583793', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791189327156', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791136798763', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791142308079', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791136799289', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791173570025', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791157064151', 1);
-INSERT INTO provides("isbn", "libraryId") values('9791187119845', 1);
-INSERT INTO provides("isbn", "libraryId") values('9788936434120', 1);
+INSERT INTO provides("isbn", "libraryId") values('6000343409', 1);
+INSERT INTO provides("isbn", "libraryId") values('6000692291', 1);
+INSERT INTO provides("isbn", "libraryId") values('6000776892', 1);
+INSERT INTO provides("isbn", "libraryId") values('6000827706', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809332973646', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809474876812', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809524091073', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809529011793', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809529012158', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809824420900', 1);
 
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9788928600915', 4, '"4 - 3" 이것은 단순한 수식이 아니다. 가슴이 철렁내려앉고, 머리속이 하얗게 질려버리는 충격적인 사건후에 홀로 남은 바버라의 이야기인 것이다.');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791191583793', 5, '새처럼 지구의 이곳저곳을 여행하던 저자가, 새를 위해 지구를 위해 여행을 자제하기로 마음먹게 되는 과정이 흥미로웠다. 닮고 싶은 태도, 닮고 싶은 작가다.');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791189327156', 4, '그어 놓은 선 저 너머를 보려고 노력하는 것. 그 자체가 삶의 소중함과 삶을 살아가는 지침이 될 수 있다는 것.');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791136798763', 2, 'test1');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791142308079', 4, 'test2');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791136799289', 1, 'test3');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791173570025', 7, 'test4');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791157064151', 7, 'test5');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9791187119845', 8, 'test6');
-INSERT INTO review("userId", "isbn", "rating", "content") values(1, '9788936434120', 3, 'test7');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000343409', 4, '"4 - 3" 이것은 단순한 수식이 아니다. 가슴이 철렁내려앉고, 머리속이 하얗게 질려버리는 충격적인 사건후에 홀로 남은 바버라의 이야기인 것이다.');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000692291', 5, '새처럼 지구의 이곳저곳을 여행하던 저자가, 새를 위해 지구를 위해 여행을 자제하기로 마음먹게 되는 과정이 흥미로웠다. 닮고 싶은 태도, 닮고 싶은 작가다.');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000776892', 4, '그어 놓은 선 저 너머를 보려고 노력하는 것. 그 자체가 삶의 소중함과 삶을 살아가는 지침이 될 수 있다는 것.');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000827706', 2, 'test1');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809332973646', 4, 'test2');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809474876812', 1, 'test3');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809524091073', 7, 'test4');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809529011793', 7, 'test5');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809529012158', 8, 'test6');
+INSERT INTO review("userId", "isbn", "rating", "content") values(1, '8809824420900', 3, 'test7');

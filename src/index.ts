@@ -31,7 +31,7 @@ const startApolloServer = async () => {
     context: async ({ req, res }) => {
       const { cache } = server;
 
-      let userId: number = null;
+      let userId: string = null;
 
       if (req.headers.authorization) {
         const data = verifyJWT(req.headers.authorization);
@@ -55,7 +55,7 @@ const startApolloServer = async () => {
           aladinAPI: new AladinAPI(),
           pgAPI: new PGAPI({ cache, knexConfig }),
         },
-        userId: userId,
+        userId,
       };
     },
   });
