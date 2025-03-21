@@ -7,7 +7,7 @@ import { AladinAPI } from "./datasources/aladinAPI";
 import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
 import { gql } from "graphql-tag";
-import { DocumentNode, GraphQLError } from "graphql";
+import { DocumentNode } from "graphql";
 import { PGAPI } from "./datasources/pg-api";
 import knexConfig from "./knex";
 import Cookies from "cookies";
@@ -25,6 +25,7 @@ const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({
     typeDefs,
     resolvers,
+    introspection: true,
   });
 
   const { url } = await startStandaloneServer(server, {
@@ -48,13 +49,14 @@ const startApolloServer = async () => {
         }
 
         userId = data.userId;
-      } else {
-        throw new GraphQLError("You are not Signed in", {
-          extensions: {
-            code: "UNAUTHENTICATED",
-          },
-        });
       }
+      // else {
+      //   throw new GraphQLError("You are not Signed in", {
+      //     extensions: {
+      //       code: "UNAUTHENTICATED",
+      //     },
+      //   });
+      // }
 
       return {
         dataSources: {
