@@ -36,9 +36,9 @@ const startApolloServer = async () => {
       let userId: string = null;
 
       const cookies = new Cookies(req, res);
-
-      if (req.headers.authorization) {
-        const data = verifyJWT(cookies.get("token"));
+      const token = cookies.get("bctp_token");
+      if (token) {
+        const data = verifyJWT(token);
 
         if (!data.isNotExp) {
           setCookie(cookies, data.userId);
