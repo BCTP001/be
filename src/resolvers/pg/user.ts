@@ -7,10 +7,9 @@ import type {
   Name,
   WelcomePackage,
 } from "../../types/interface/pg-api";
-import { signJWT } from "../../utils";
 import { type Resolvers } from "../../types/generated";
 import { DataSourceContext } from "../../context";
-import { hashPw, isPasswordSecure } from "../../utils";
+import { hashPw, isPasswordSecure, setCookie } from "../../utils";
 import { GraphQLError } from "graphql";
 
 export const userResolvers: Resolvers = {
@@ -68,7 +67,7 @@ export const userResolvers: Resolvers = {
     signIn: async (
       _: any,
       { username, password }: { username: Username; password: Password },
-      { userId, dataSources, res }: DataSourceContext,
+      { userId, dataSources, cookies }: DataSourceContext,
     ): Promise<WelcomePackage> => {
       if (userId !== null) {
         throw new GraphQLError("You cannot sign in when you're signed in.", {
@@ -82,8 +81,27 @@ export const userResolvers: Resolvers = {
         username,
         password,
       );
-      res.setHeader("Authorization", signJWT(welcomePackage.signedInAs.id));
+      setCookie(cookies, welcomePackage.signedInAs.id);
+
       return welcomePackage;
+    },
+    signOut: async (
+      _: any,
+      __: any,
+      { userId, cookies }: DataSourceContext,
+    ): Promise<void> => {
+      if (userId === null) {
+        throw new GraphQLError(
+          "You cannot sign out when you're not signed in",
+          {
+            extensions: {
+              code: "FORBIDDEN",
+            },
+          },
+        );
+      }
+
+      cookies.set("bctp_token", null);
     },
   },
 };

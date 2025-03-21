@@ -7,10 +7,11 @@ import { AladinAPI } from "./datasources/aladinAPI";
 import { DataSourceContext } from "./context";
 import { readFileSync } from "fs";
 import { gql } from "graphql-tag";
-import { DocumentNode, GraphQLError } from "graphql";
+import { DocumentNode } from "graphql";
 import { PGAPI } from "./datasources/pg-api";
 import knexConfig from "./knex";
-import { signJWT, verifyJWT } from "./utils";
+import Cookies from "cookies";
+import { setCookie, verifyJWT } from "./utils";
 
 const typeDefs: DocumentNode = gql(
   readFileSync(path.resolve(__dirname, "../src/schema.graphql"), {
@@ -24,6 +25,7 @@ const startApolloServer = async () => {
   const server: ApolloServer<DataSourceContext> = new ApolloServer({
     typeDefs,
     resolvers,
+    introspection: true,
   });
 
   const { url } = await startStandaloneServer(server, {
@@ -33,21 +35,16 @@ const startApolloServer = async () => {
 
       let userId: string = null;
 
-      if (req.headers.authorization) {
-        const data = verifyJWT(req.headers.authorization);
+      const cookies = new Cookies(req, res);
+      const token = cookies.get("bctp_token");
+      if (token) {
+        const data = verifyJWT(token);
 
         if (!data.isNotExp) {
-          const newToken = signJWT(data.userId);
-          res.setHeader("Authorization", newToken);
+          setCookie(cookies, data.userId);
         }
 
         userId = data.userId;
-      } else {
-        throw new GraphQLError("You are not Signed in", {
-          extensions: {
-            code: "UNAUTHENTICATED",
-          },
-        });
       }
 
       return {
@@ -56,7 +53,7 @@ const startApolloServer = async () => {
           pgAPI: new PGAPI({ cache, knexConfig }),
         },
         userId,
-        res,
+        cookies,
       };
     },
   });

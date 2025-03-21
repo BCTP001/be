@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { GraphQLError } from "graphql";
 import dotenv from "dotenv";
+import Cookies from "cookies";
 
 dotenv.config({ path: ".env" });
 
@@ -64,4 +65,12 @@ export function verifyJWT(token: string): {
   } catch (err) {
     throw new GraphQLError(err);
   }
+}
+
+export function setCookie(cookies: Cookies, id: string) {
+  cookies.set("bctp_token", signJWT(id), {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+  });
 }
