@@ -7,10 +7,9 @@ import type {
   Name,
   WelcomePackage,
 } from "../../types/interface/pg-api";
-import { signJWT } from "../../utils";
 import { type Resolvers } from "../../types/generated";
 import { DataSourceContext } from "../../context";
-import { hashPw, isPasswordSecure } from "../../utils";
+import { hashPw, isPasswordSecure, setCookie } from "../../utils";
 import { GraphQLError } from "graphql";
 
 export const userResolvers: Resolvers = {
@@ -83,11 +82,7 @@ export const userResolvers: Resolvers = {
         password,
       );
 
-      cookies.set("token", signJWT(welcomePackage.signedInAs.id), {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
+      setCookie(cookies, welcomePackage.signedInAs.id);
 
       return welcomePackage;
     },

@@ -11,7 +11,7 @@ import { DocumentNode } from "graphql";
 import { PGAPI } from "./datasources/pg-api";
 import knexConfig from "./knex";
 import Cookies from "cookies";
-import { signJWT, verifyJWT } from "./utils";
+import { setCookie, verifyJWT } from "./utils";
 
 const typeDefs: DocumentNode = gql(
   readFileSync(path.resolve(__dirname, "../src/schema.graphql"), {
@@ -41,22 +41,11 @@ const startApolloServer = async () => {
         const data = verifyJWT(cookies.get("token"));
 
         if (!data.isNotExp) {
-          cookies.set("token", signJWT(data.userId), {
-            httpOnly: true,
-            secure: true,
-            sameSite: "strict",
-          });
+          setCookie(cookies, data.userId);
         }
 
         userId = data.userId;
       }
-      // else {
-      //   throw new GraphQLError("You are not Signed in", {
-      //     extensions: {
-      //       code: "UNAUTHENTICATED",
-      //     },
-      //   });
-      // }
 
       return {
         dataSources: {
