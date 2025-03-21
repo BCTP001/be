@@ -1,3 +1,5 @@
+scalar Void
+
 # SEARCH BOOKS
 
 input SearchOption {
@@ -123,6 +125,7 @@ type Mutation {
   deleteReview(id: ID!): ID
   signUp(name: String!, username: String!, password: String!): User
   signIn(username: String!, password: String!): WelcomePackage
+  signOut: Void
 }
 
 type WelcomePackage {

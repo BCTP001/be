@@ -81,10 +81,27 @@ export const userResolvers: Resolvers = {
         username,
         password,
       );
-
       setCookie(cookies, welcomePackage.signedInAs.id);
 
       return welcomePackage;
+    },
+    signOut: async (
+      _: any,
+      __: any,
+      { userId, cookies }: DataSourceContext,
+    ): Promise<void> => {
+      if (userId === null) {
+        throw new GraphQLError(
+          "You cannot sign out when you're not signed in",
+          {
+            extensions: {
+              code: "FORBIDDEN",
+            },
+          },
+        );
+      }
+
+      cookies.set("bctp_token", null);
     },
   },
 };
