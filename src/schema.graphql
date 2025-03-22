@@ -91,18 +91,26 @@ type Feed {
 # SHELF
 
 input GetBooksInShelfRequest {
-  userId: Int
+  shelfName: String
 }
 
 input UpdateShelfRequest {
   containList: [String]
   excludeList: [String]
-  userId: Int
+  shelfName: String
 }
 
 type UpdateShelfResponse {
   msg: String
   shelfName: String
+}
+
+input CreateShelfRequest {
+  shelfName: String
+}
+
+type CreateShelfResponse {
+  msg: String
 }
 
 type Query {
@@ -119,6 +127,7 @@ type Query {
 
 type Mutation {
   createUser(username: String!, name: String!): User
+  createShelf(request: CreateShelfRequest!): CreateShelfResponse
   updateShelf(request: UpdateShelfRequest!): UpdateShelfResponse
   createReview(createReviewArgs: CreateReviewArgs!): ID
   updateReview(updateReviewArgs: UpdateReviewArgs!): ID
