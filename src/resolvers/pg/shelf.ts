@@ -3,9 +3,11 @@ import { GraphQLError } from "graphql";
 import { DataSourceContext } from "../../context";
 import { type Resolvers } from "../../types/generated";
 import type {
+  CreateShelfRequest,
+  CreateShelfResponse,
   UpdateShelfRequest,
   UpdateShelfResponse,
-  UserId,
+  getBooksInShelfRequest,
 } from "../../types/interface/pg-api";
 import { type GetBookInfoItem } from "../../types/interface/aladinAPI";
 
@@ -13,12 +15,12 @@ export const shelfResolvers: Resolvers = {
   Query: {
     getBooksInShelf: async (
       _: any,
-      { request }: { request: UserId },
+      { request }: { request: getBooksInShelfRequest },
       { dataSources }: DataSourceContext,
     ): Promise<GetBookInfoItem[]> => {
       try {
         const isbn13List: { isbn: string }[] =
-          await dataSources.pgAPI.getBooksInShelf(request.userId);
+          await dataSources.pgAPI.getBooksInShelf(request.shelfName);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -33,6 +35,33 @@ export const shelfResolvers: Resolvers = {
     },
   },
   Mutation: {
+    createShelf: async (
+      _: any,
+      { request }: { request: CreateShelfRequest },
+      { dataSources, userId }: DataSourceContext,
+    ): Promise<CreateShelfResponse> => {
+      try {
+        if (!userId) {
+          throw new GraphQLError(
+            "You can create Shelf when you're signed in.",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        dataSources.pgAPI.createShelf(userId, request.shelfName);
+
+        return {
+          msg: `${request.shelfName} Shelf Create Success!!`,
+        };
+      } catch (err) {
+        throw new GraphQLError(err);
+      }
+    },
+
     updateShelf: async (
       _: any,
       { request }: { request: UpdateShelfRequest },
@@ -52,7 +81,9 @@ export const shelfResolvers: Resolvers = {
           newBooks.map((isbn13) => dataSources.pgAPI.insertBook(isbn13)),
         );
 
-        const shelfInfo = await dataSources.pgAPI.getShelfInfo(request.userId);
+        const shelfInfo = await dataSources.pgAPI.getShelfInfo(
+          request.shelfName,
+        );
 
         await Promise.all(
           request.containList.map((isbn13) =>
