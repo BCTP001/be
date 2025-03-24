@@ -131,13 +131,20 @@ export class DB extends BatchedSQLDataSource {
     await this.db.write.insert({ isbn }).into("book");
   };
 
+  createShelf = async (userId: Id, name: string): Promise<void> => {
+    await this.db.write
+      .insert({ name, userId })
+      .into("shelf")
+      .returning(["id", "name", "userId"]);
+  };
+
   getShelfInfo = async (
-    userId: number,
+    name: string,
   ): Promise<{ name: string; id: number }> => {
     const shelfRow = await this.db.query
       .select("name", "id")
       .from("shelf")
-      .where({ userId });
+      .where({ name });
 
     return shelfRow[0];
   };
@@ -154,12 +161,12 @@ export class DB extends BatchedSQLDataSource {
     await this.db.write.from("contains").where({ isbn }).del();
   };
 
-  getBooksInShelf = async (userId: number): Promise<{ isbn: string }[]> => {
+  getBooksInShelf = async (shelfName: string): Promise<{ isbn: string }[]> => {
     const containsRow = await this.db.query
       .select("c.isbn")
       .from({ s: "shelf" })
       .join({ c: "contains" }, "s.id", "c.shelfId")
-      .where("s.userId", userId);
+      .where("s.name", shelfName);
 
     return containsRow.map((row) => ({ isbn: row.isbn }));
   };

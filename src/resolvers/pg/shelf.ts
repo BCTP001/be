@@ -3,9 +3,11 @@ import { GraphQLError } from "graphql";
 import { Context } from "@interface/context";
 import { type Resolvers } from "@generated";
 import type {
+  CreateShelfRequest,
+  CreateShelfResponse,
   UpdateShelfRequest,
   UpdateShelfResponse,
-  UserId,
+  getBooksInShelfRequest,
 } from "@interface/db";
 import { type GetBookInfoItem } from "@interface/aladin";
 
@@ -13,12 +15,12 @@ export const shelfResolvers: Resolvers = {
   Query: {
     getBooksInShelf: async (
       _: any,
-      { request }: { request: UserId },
+      { request }: { request: getBooksInShelfRequest },
       { dataSources }: Context,
     ): Promise<GetBookInfoItem[]> => {
       try {
         const isbn13List: { isbn: string }[] =
-          await dataSources.db.getBooksInShelf(request.userId);
+          await dataSources.db.getBooksInShelf(request.shelfName);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -33,6 +35,33 @@ export const shelfResolvers: Resolvers = {
     },
   },
   Mutation: {
+    createShelf: async (
+      _: any,
+      { request }: { request: CreateShelfRequest },
+      { dataSources, userId }: Context,
+    ): Promise<CreateShelfResponse> => {
+      try {
+        if (!userId) {
+          throw new GraphQLError(
+            "You can create Shelf when you're signed in.",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        dataSources.db.createShelf(userId, request.shelfName);
+
+        return {
+          msg: `${request.shelfName} Shelf Create Success!!`,
+        };
+      } catch (err) {
+        throw new GraphQLError(err);
+      }
+    },
+
     updateShelf: async (
       _: any,
       { request }: { request: UpdateShelfRequest },
@@ -52,7 +81,7 @@ export const shelfResolvers: Resolvers = {
           newBooks.map((isbn13) => dataSources.db.insertBook(isbn13)),
         );
 
-        const shelfInfo = await dataSources.db.getShelfInfo(request.userId);
+        const shelfInfo = await dataSources.db.getShelfInfo(request.shelfName);
 
         await Promise.all(
           request.containList.map((isbn13) =>

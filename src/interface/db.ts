@@ -44,15 +44,27 @@ export interface UserId {
   userId: number;
 }
 
+export interface getBooksInShelfRequest {
+  shelfName: string;
+}
+
 export interface UpdateShelfRequest {
   containList: string[];
   excludeList: string[];
-  userId: number;
+  shelfName: string;
 }
 
 export interface UpdateShelfResponse {
   msg: string;
   shelfName: string;
+}
+
+export interface CreateShelfRequest {
+  shelfName: string;
+}
+
+export interface CreateShelfResponse {
+  msg: string;
 }
 
 export type Isbn = string;
