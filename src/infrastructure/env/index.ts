@@ -1,5 +1,17 @@
 import dotenv from "dotenv";
-import { getEnv, castEnv } from "./utils";
+
+function getEnv(name: string) {
+  return process.env[name];
+}
+
+function castEnv<EnumT>(name: string, defaultValue: EnumT) {
+  const configured = getEnv(name);
+  if (configured === undefined) {
+    return defaultValue;
+  } else {
+    return configured as EnumT;
+  }
+}
 
 dotenv.config({ path: ".env" });
 

@@ -13,11 +13,11 @@ import {
   Password,
   WelcomePackage,
   Useruser,
-} from "../types/interface/pg-api";
+} from "@interface/db";
 import { GraphQLError } from "graphql";
-import { checkPw } from "../utils";
+import { checkPw } from "@utils";
 
-export class PGAPI extends BatchedSQLDataSource {
+export class DB extends BatchedSQLDataSource {
   createUser = async (
     name: Name,
     username: Username,

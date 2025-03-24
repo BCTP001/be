@@ -1,4 +1,4 @@
-import { Resolvers } from "../../types/generated";
+import { Resolvers } from "@generated";
 import { userResolvers } from "./user";
 import { reviewResolvers } from "./review";
 import { feedResolvers } from "./feed";

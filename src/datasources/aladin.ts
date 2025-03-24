@@ -9,12 +9,12 @@ import type {
   AladinAPIRecommendBookListResponse,
   RecommendBookIsbnObject,
   RecommendQueryType,
-} from "../types/interface/aladinAPI";
+} from "@interface/aladin";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-export class AladinAPI extends RESTDataSource {
+export class Aladin extends RESTDataSource {
   constructor() {
     super();
     this.baseURL = "https://www.aladin.co.kr/ttb/api/";

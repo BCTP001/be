@@ -4,48 +4,50 @@ import type {
   Review,
   InsertReviewArgs,
   UpdateReviewArgs,
-} from "../../types/interface/pg-api";
-import { type Resolvers } from "../../types/generated";
-import { DataSourceContext } from "../../context";
+} from "@interface/db";
+import { QueryResolvers, type Resolvers } from "@generated";
+import { Context } from "@interface/context";
+
+const rr: QueryResolvers = {
+  reviews: async (
+    _,
+    { isbn }: { isbn: Isbn },
+    { dataSources }: Context,
+  ): Promise<Review[]> => {
+    return await dataSources.db.searchReviewsByBook(isbn);
+  },
+  review: async (
+    _,
+    { id }: { id: Id },
+    { dataSources }: Context,
+  ): Promise<Review> => {
+    return await dataSources.db.lookupReview(id);
+  },
+};
 
 export const reviewResolvers: Resolvers = {
-  Query: {
-    reviews: async (
-      _,
-      { isbn }: { isbn: Isbn },
-      { dataSources }: DataSourceContext,
-    ): Promise<Review[]> => {
-      return await dataSources.pgAPI.searchReviewsByBook(isbn);
-    },
-    review: async (
-      _,
-      { id }: { id: Id },
-      { dataSources }: DataSourceContext,
-    ): Promise<Review> => {
-      return await dataSources.pgAPI.lookupReview(id);
-    },
-  },
+  Query: rr,
   Mutation: {
     createReview: async (
       _,
       { createReviewArgs }: { createReviewArgs: InsertReviewArgs },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<Id> => {
-      return await dataSources.pgAPI.insertReview(createReviewArgs);
+      return await dataSources.db.insertReview(createReviewArgs);
     },
     updateReview: async (
       _,
       { updateReviewArgs }: { updateReviewArgs: UpdateReviewArgs },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<Id> => {
-      return await dataSources.pgAPI.updateReview(updateReviewArgs);
+      return await dataSources.db.updateReview(updateReviewArgs);
     },
     deleteReview: async (
       _,
       { id }: { id: Id },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<Id> => {
-      return await dataSources.pgAPI.deleteReview(id);
+      return await dataSources.db.deleteReview(id);
     },
   },
 };

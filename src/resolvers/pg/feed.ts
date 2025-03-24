@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { DataSourceContext } from "../../context";
-import { type Resolvers } from "../../types/generated";
-import { type Feed } from "../../types/interface/pg-api";
+import { Context } from "@interface/context";
+import { type Resolvers } from "@generated";
+import { type Feed } from "@interface/db";
 
 export const feedResolvers: Resolvers = {
   Query: {
     getFeed: async (
       _: any,
       __: any,
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<Feed[]> => {
       try {
-        const pgData = await dataSources.pgAPI.getFeed();
+        const pgData = await dataSources.db.getFeed();
 
         const bookInfoList = await Promise.all(
-          pgData.map(({ isbn13 }) => dataSources.aladinAPI.getBookInfo(isbn13)),
+          pgData.map(({ isbn13 }) => dataSources.aladin.getBookInfo(isbn13)),
         );
 
         return pgData.map((data, index) => ({
