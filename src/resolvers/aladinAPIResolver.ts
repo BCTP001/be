@@ -4,9 +4,9 @@ import type {
   GetBookInfoItem,
   RecommendBookIsbnObject,
   RecommendBookListRequest,
-} from "../types/interface/aladinAPI";
-import { type Resolvers } from "../types/generated";
-import { DataSourceContext } from "../context";
+} from "@interface/aladin";
+import { type Resolvers } from "@generated";
+import { Context } from "@interface/context";
 import { GraphQLError } from "graphql";
 
 export const aladinAPIResolver: Resolvers = {
@@ -14,7 +14,7 @@ export const aladinAPIResolver: Resolvers = {
     searchBooksAndGetBookInfo: async (
       _source: undefined,
       { searchOption }: { searchOption: SearchOption },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ) => {
       try {
         if (!searchOption || !searchOption.searchQuery) {
@@ -22,12 +22,12 @@ export const aladinAPIResolver: Resolvers = {
         }
 
         const bookIsbn13List: string[] =
-          await dataSources.aladinAPI.getBookIsbn13List(searchOption);
+          await dataSources.aladin.getBookIsbn13List(searchOption);
 
         const response: Promise<GetBookInfoItem>[] = [];
 
         bookIsbn13List.map((value) => {
-          response.push(dataSources.aladinAPI.getBookInfo(value));
+          response.push(dataSources.aladin.getBookInfo(value));
         });
 
         return await Promise.all(response);
@@ -40,15 +40,16 @@ export const aladinAPIResolver: Resolvers = {
     getBookInfo: async (
       _source: undefined,
       { getBookInfoRequest }: { getBookInfoRequest: GetBookInfoRequest },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ) => {
       try {
         if (!getBookInfoRequest || !getBookInfoRequest.isbn13) {
           throw new GraphQLError("itemId is required");
         }
 
-        const bookInfo: GetBookInfoItem =
-          await dataSources.aladinAPI.getBookInfo(getBookInfoRequest.isbn13);
+        const bookInfo: GetBookInfoItem = await dataSources.aladin.getBookInfo(
+          getBookInfoRequest.isbn13,
+        );
 
         return bookInfo;
       } catch (err) {
@@ -60,7 +61,7 @@ export const aladinAPIResolver: Resolvers = {
     getRecommendBookList: async (
       _source: undefined,
       { request }: { request: RecommendBookListRequest },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ) => {
       try {
         if (!request || !request.queryType) {
@@ -68,11 +69,11 @@ export const aladinAPIResolver: Resolvers = {
         }
 
         const recommendBookList: RecommendBookIsbnObject =
-          await dataSources.aladinAPI.getRecommendBookList(request.queryType);
+          await dataSources.aladin.getRecommendBookList(request.queryType);
 
         const bookInfoList: Promise<GetBookInfoItem>[] =
           recommendBookList.isbn13List.map((isbn) =>
-            dataSources.aladinAPI.getBookInfo(isbn),
+            dataSources.aladin.getBookInfo(isbn),
           );
 
         return await Promise.all(bookInfoList);

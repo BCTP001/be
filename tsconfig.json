@@ -18,9 +18,24 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "*": ["types/*"]
+      "@": ["src"],
+      "@/*": ["src/*"],
+      "@datasources": ["src/datasources"],
+      "@datasources/*": ["src/datasources/*"],
+      "@interface": ["src/interface"],
+      "@interface/*": ["src/interface/*"],
+      "@resolvers": ["src/resolvers"],
+      "@resolvers/*": ["src/resolvers/*"],
+      "@env": ["src/infrastructure/env"],
+      "@env/*": ["src/infrastructure/env/*"],
+      "@knex": ["src/infrastructure/knex"],
+      "@knex/*": ["src/infrastructure/knex/*"],
+      "@generated": ["src/infrastructure/generated"],
+      "@generated/*": ["src/infrastructure/generated/*"],
+      "@utils": ["src/infrastructure/utils"],
+      "@utils/*": ["src/infrastructure/utils/*"]
     },
-    "typeRoots": ["node_modules/@types", "src/@types"],
+    "typeRoots": ["node_modules/@types"]
   },
   "files": ["src/graphql.d.ts"],
   "include": [

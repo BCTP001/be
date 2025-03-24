@@ -1,17 +1,18 @@
 import path from "path";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-import { aladinAPIResolver } from "./resolvers/aladinAPIResolver";
-import { pgResolvers } from "./resolvers/pg";
-import { AladinAPI } from "./datasources/aladinAPI";
-import { DataSourceContext } from "./context";
-import { readFileSync } from "fs";
 import { gql } from "graphql-tag";
+import { readFileSync } from "fs";
 import { DocumentNode } from "graphql";
-import { PGAPI } from "./datasources/pg-api";
-import knexConfig from "./knex";
 import Cookies from "cookies";
-import { setCookie, verifyJWT } from "./utils";
+
+import { aladinAPIResolver } from "@resolvers/aladinAPIResolver";
+import { pgResolvers } from "@resolvers/pg";
+import { Aladin } from "@datasources/aladin";
+import { Context } from "@interface/context";
+import { DB } from "@datasources/db";
+import knexConfig from "@knex";
+import { setCookie, verifyJWT } from "@utils";
 
 const typeDefs: DocumentNode = gql(
   readFileSync(path.resolve(__dirname, "../src/schema.graphql"), {
@@ -22,7 +23,7 @@ const typeDefs: DocumentNode = gql(
 const resolvers = [aladinAPIResolver, pgResolvers];
 
 const startApolloServer = async () => {
-  const server: ApolloServer<DataSourceContext> = new ApolloServer({
+  const server: ApolloServer<Context> = new ApolloServer({
     typeDefs,
     resolvers,
     introspection: true,
@@ -30,7 +31,7 @@ const startApolloServer = async () => {
 
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
-    context: async ({ req, res }) => {
+    context: async ({ req, res }): Promise<Context> => {
       const { cache } = server;
 
       let userId: string = null;
@@ -49,8 +50,8 @@ const startApolloServer = async () => {
 
       return {
         dataSources: {
-          aladinAPI: new AladinAPI(),
-          pgAPI: new PGAPI({ cache, knexConfig }),
+          aladin: new Aladin(),
+          db: new DB({ cache, knexConfig }),
         },
         userId,
         cookies,

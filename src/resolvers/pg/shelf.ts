@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { DataSourceContext } from "../../context";
-import { type Resolvers } from "../../types/generated";
+import { Context } from "@interface/context";
+import { type Resolvers } from "@generated";
 import type {
   CreateShelfRequest,
   CreateShelfResponse,
   UpdateShelfRequest,
   UpdateShelfResponse,
   getBooksInShelfRequest,
-} from "../../types/interface/pg-api";
-import { type GetBookInfoItem } from "../../types/interface/aladinAPI";
+} from "@interface/db";
+import { type GetBookInfoItem } from "@interface/aladin";
 
 export const shelfResolvers: Resolvers = {
   Query: {
     getBooksInShelf: async (
       _: any,
       { request }: { request: getBooksInShelfRequest },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<GetBookInfoItem[]> => {
       try {
         const isbn13List: { isbn: string }[] =
-          await dataSources.pgAPI.getBooksInShelf(request.shelfName);
+          await dataSources.db.getBooksInShelf(request.shelfName);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
         isbn13List.map((value) => {
-          bookInfoList.push(dataSources.aladinAPI.getBookInfo(value.isbn));
+          bookInfoList.push(dataSources.aladin.getBookInfo(value.isbn));
         });
 
         return await Promise.all(bookInfoList);
@@ -38,7 +38,7 @@ export const shelfResolvers: Resolvers = {
     createShelf: async (
       _: any,
       { request }: { request: CreateShelfRequest },
-      { dataSources, userId }: DataSourceContext,
+      { dataSources, userId }: Context,
     ): Promise<CreateShelfResponse> => {
       try {
         if (!userId) {
@@ -52,7 +52,7 @@ export const shelfResolvers: Resolvers = {
           );
         }
 
-        dataSources.pgAPI.createShelf(userId, request.shelfName);
+        dataSources.db.createShelf(userId, request.shelfName);
 
         return {
           msg: `${request.shelfName} Shelf Create Success!!`,
@@ -65,10 +65,10 @@ export const shelfResolvers: Resolvers = {
     updateShelf: async (
       _: any,
       { request }: { request: UpdateShelfRequest },
-      { dataSources }: DataSourceContext,
+      { dataSources }: Context,
     ): Promise<UpdateShelfResponse> => {
       try {
-        const existingBooks = await dataSources.pgAPI.getExistingBooks([
+        const existingBooks = await dataSources.db.getExistingBooks([
           ...request.containList,
           ...request.excludeList,
         ]);
@@ -78,16 +78,14 @@ export const shelfResolvers: Resolvers = {
         );
 
         await Promise.all(
-          newBooks.map((isbn13) => dataSources.pgAPI.insertBook(isbn13)),
+          newBooks.map((isbn13) => dataSources.db.insertBook(isbn13)),
         );
 
-        const shelfInfo = await dataSources.pgAPI.getShelfInfo(
-          request.shelfName,
-        );
+        const shelfInfo = await dataSources.db.getShelfInfo(request.shelfName);
 
         await Promise.all(
           request.containList.map((isbn13) =>
-            dataSources.pgAPI.insertContains(shelfInfo.id, isbn13),
+            dataSources.db.insertContains(shelfInfo.id, isbn13),
           ),
         );
 
@@ -96,9 +94,7 @@ export const shelfResolvers: Resolvers = {
         );
 
         await Promise.all(
-          removableBooks.map((isbn13) =>
-            dataSources.pgAPI.deleteContains(isbn13),
-          ),
+          removableBooks.map((isbn13) => dataSources.db.deleteContains(isbn13)),
         );
 
         return {

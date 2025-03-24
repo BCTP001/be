@@ -25,7 +25,7 @@ node_modules/
 .DS_Store
 
 # Always regenerate new types before running project
-/src/types/generated.ts
+/src/infrastructure/generated/index.ts
 
 # postgresql data
 docker/local.pgdata/

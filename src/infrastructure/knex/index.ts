@@ -1,6 +1,6 @@
 import { BatchedSQLDataSourceProps } from "@nic-jennings/sql-datasource";
-import { NodeEnv } from "../env";
-import env from "../env";
+import { NodeEnv } from "@env";
+import env from "@env";
 
 type KnexConfig = BatchedSQLDataSourceProps["knexConfig"];
 

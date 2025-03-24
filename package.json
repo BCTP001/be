@@ -19,10 +19,10 @@
   },
   "scripts": {
     "lint": "eslint --report-unused-disable-directives --fix --no-warn-ignored",
-    "build": "npm run lint && tsc",
+    "build": "npm run lint && tsc -p . && tsc-alias",
     "compile": "tsc",
-    "dev": "concurrently \"node -r ts-node/register --watch-path=\"./src/\" ./src/index.ts\" \"npm run generate\"",
-    "start": "npm run compile && nodemon ./dist/index.js",
+    "dev": "concurrently \"node -r ts-node/register -r tsconfig-paths/register --watch-path=\"./src/\" ./src/index.ts\" \"npm run generate\"",
+    "start": "npm run build && nodemon ./dist/index.js",
     "generate": "graphql-codegen --watch \"src/schema.graphql\"",
     "migration:up": "env $(cat .env) knex migrate:up --knexfile src/knex/knexfile.ts",
     "migration:down": "env $(cat .env) knex migrate:down --knexfile src/knex/knexfile.ts"
@@ -64,6 +64,8 @@
     "nodemon": "^3.0.0",
     "prettier": "^3.4.2",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.11",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.20.0"
   }
