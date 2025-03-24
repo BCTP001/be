@@ -6,8 +6,7 @@ import { readFileSync } from "fs";
 import { DocumentNode } from "graphql";
 import Cookies from "cookies";
 
-import { aladinAPIResolver } from "@resolvers/aladinAPIResolver";
-import { pgResolvers } from "@resolvers/pg";
+import resolvers from "@resolvers";
 import { Aladin } from "@datasources/aladin";
 import { Context } from "@interface/context";
 import { DB } from "@datasources/db";
@@ -19,8 +18,6 @@ const typeDefs: DocumentNode = gql(
     encoding: "utf-8",
   }),
 );
-
-const resolvers = [aladinAPIResolver, pgResolvers];
 
 const startApolloServer = async () => {
   const server: ApolloServer<Context> = new ApolloServer({

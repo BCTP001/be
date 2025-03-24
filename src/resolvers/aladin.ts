@@ -9,7 +9,7 @@ import { type Resolvers } from "@generated";
 import { Context } from "@interface/context";
 import { GraphQLError } from "graphql";
 
-export const aladinAPIResolver: Resolvers = {
+export const aladinResolvers: Resolvers = {
   Query: {
     searchBooksAndGetBookInfo: async (
       _source: undefined,
