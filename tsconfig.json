@@ -18,8 +18,6 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "@": ["src"],
-      "@/*": ["src/*"],
       "@datasources": ["src/datasources"],
       "@datasources/*": ["src/datasources/*"],
       "@interface": ["src/interface"],
