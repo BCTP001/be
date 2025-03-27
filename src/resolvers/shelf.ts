@@ -8,7 +8,7 @@ import type {
   UpdateShelfRequest,
   UpdateShelfResponse,
   getBooksInShelfRequest,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
 import { type GetBookInfoItem } from "@interface/aladin";
 
 export const shelfResolvers: Resolvers = {

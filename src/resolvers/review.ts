@@ -4,7 +4,7 @@ import type {
   Review,
   InsertReviewArgs,
   UpdateReviewArgs,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
 import { QueryResolvers, type Resolvers } from "@generated";
 import { Context } from "@interface/context";
 

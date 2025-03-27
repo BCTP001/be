@@ -13,7 +13,8 @@ import {
   Password,
   WelcomePackage,
   Useruser,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
+import library from "@datasources/db/library";
 import { GraphQLError } from "graphql";
 import { checkPw } from "@utils";
 
@@ -208,4 +209,6 @@ export class DB extends BatchedSQLDataSource {
       .returning(["id"]);
     return deletedReviews[0].id;
   };
+
+  library = library;
 }

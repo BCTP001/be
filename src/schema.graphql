@@ -123,6 +123,7 @@ type Query {
   getBooksInShelf(request: GetBooksInShelfRequest!): [GetBookInfoItem]
   reviews(isbn: String!): [Review!]!
   review(id: ID!): Review
+  librariesByUser(id: ID!): [LibraryWithAuthority!]!
 }
 
 type Mutation {
@@ -135,6 +136,7 @@ type Mutation {
   signUp(name: String!, username: String!, password: String!): User
   signIn(username: String!, password: String!): WelcomePackage
   signOut: Void
+  createLibrary(name: String!): Void
 }
 
 type WelcomePackage {
@@ -168,4 +170,12 @@ input UpdateReviewArgs {
   id: ID!
   rating: Int!
   content: String
+}
+
+# Feature "library"
+
+type LibraryWithAuthority {
+  id: ID!
+  name: String
+  authority: String
 }
