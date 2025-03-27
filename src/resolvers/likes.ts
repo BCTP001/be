@@ -6,7 +6,7 @@ import type {
   BookSchema,
   UpdateLikeBooksRequest,
   UpdateLikeBooksResponse,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
 import { GetBookInfoItem } from "@interface/aladin";
 
 export const likesResolvers: Resolvers = {

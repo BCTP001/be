@@ -5,7 +5,7 @@ import {
   type RecommendBooksRequest,
   type RecommendBookInfo,
   type BookData,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
 import { Index } from "faiss-node";
 import { CohereClient } from "cohere-ai";
 import { readFileSync, existsSync } from "fs";

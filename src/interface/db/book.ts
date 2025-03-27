@@ -1,0 +1,26 @@
+export type Isbn = string;
+export type Title = string;
+export type Link = string;
+export type Author = string;
+export type PubDate = Date;
+export type Description = string;
+export type Creator = string;
+export type Cover = string;
+export type CategoryId = string;
+export type CategoryName = string;
+export type Publisher = string;
+export type CustomerReviewRank = number;
+export type Book = {
+  isbn: Isbn;
+  title: Title;
+  link: Link;
+  author: Author;
+  pubDate: PubDate;
+  description: Description;
+  creator: Creator;
+  cover: Cover;
+  categoryId: CategoryId;
+  categoryName: CategoryName;
+  publisher: Publisher;
+  customerReviewRank: CustomerReviewRank;
+};

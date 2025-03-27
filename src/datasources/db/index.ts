@@ -14,7 +14,8 @@ import {
   WelcomePackage,
   Useruser,
   BookSchema,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
+import library from "@datasources/db/library";
 import { GraphQLError } from "graphql";
 import { checkPw } from "@utils";
 
@@ -238,4 +239,6 @@ export class DB extends BatchedSQLDataSource {
       .where({ userId });
     return likeRows.map((row) => ({ isbn: row.isbn }));
   };
+  
+  library = library;
 }

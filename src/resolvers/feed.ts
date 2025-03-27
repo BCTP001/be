@@ -2,7 +2,7 @@
 import { GraphQLError } from "graphql";
 import { Context } from "@interface/context";
 import { type Resolvers } from "@generated";
-import { PgFeedObject, type Feed } from "@interface/db";
+import { PgFeedObject, type Feed } from "@interface/to-be-deprecated";
 
 export const feedResolvers: Resolvers = {
   Query: {

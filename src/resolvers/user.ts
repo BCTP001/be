@@ -6,7 +6,7 @@ import type {
   Password,
   Name,
   WelcomePackage,
-} from "@interface/db";
+} from "@interface/to-be-deprecated";
 import { type Resolvers } from "@generated";
 import { Context } from "@interface/context";
 import { hashPw, isPasswordSecure, setCookie } from "@utils";

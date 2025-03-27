@@ -6,6 +6,7 @@ import { shelfResolvers } from "./shelf";
 import { likesResolvers } from "./likes";
 import { aladinResolvers } from "./aladin";
 import { aiRecommendationResolvers } from "./aiRecommendation";
+import { libraryResolvers } from "./library";
 
 const resolvers: Resolvers[] = [
   userResolvers,
@@ -15,6 +16,7 @@ const resolvers: Resolvers[] = [
   likesResolvers,
   aladinResolvers,
   aiRecommendationResolvers,
+  libraryResolvers,
 ];
 
 export default resolvers;
