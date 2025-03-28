@@ -91,3 +91,12 @@ export interface UpdateReviewArgs {
   rating: Rating;
   content: Content;
 }
+
+export interface UpdateLikeBooksRequest {
+  containList: string[];
+  excludeList: string[];
+}
+
+export interface UpdateLikeBooksResponse {
+  msg: string;
+}

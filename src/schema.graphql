@@ -113,6 +113,15 @@ type CreateShelfResponse {
   msg: String
 }
 
+input UpdateLikeBooksRequest {
+  containList: [String]
+  excludeList: [String]
+}
+
+type UpdateLikeBooksResponse {
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -129,6 +138,7 @@ type Mutation {
   createUser(username: String!, name: String!): User
   createShelf(request: CreateShelfRequest!): CreateShelfResponse
   updateShelf(request: UpdateShelfRequest!): UpdateShelfResponse
+  updateLikeBooks(request: UpdateLikeBooksRequest!): UpdateLikeBooksResponse
   createReview(createReviewArgs: CreateReviewArgs!): ID
   updateReview(updateReviewArgs: UpdateReviewArgs!): ID
   deleteReview(id: ID!): ID

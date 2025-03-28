@@ -208,4 +208,15 @@ export class DB extends BatchedSQLDataSource {
       .returning(["id"]);
     return deletedReviews[0].id;
   };
+
+  insertLikes = async (userId: Id, isbnList: string[]): Promise<void> => {
+    const newLikes = isbnList.map((isbn) => ({ userId, isbn }));
+    await this.db.write.insert(newLikes).into("likes")
+    .onConflict(["userId", "isbn"])
+    .ignore();
+  }
+
+  deleteLikes = async (userId: Id, isbnList: string[]): Promise<void> => {
+    await this.db.write.from("likes").where({ userId }).whereIn("isbn", isbnList).del();
+  }
 }
