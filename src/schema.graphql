@@ -130,6 +130,7 @@ type Query {
   users: [User]!
   getFeed: [Feed]!
   getBooksInShelf(request: GetBooksInShelfRequest!): [GetBookInfoItem]
+  getLikeBooks: [GetBookInfoItem]
   reviews(isbn: String!): [Review!]!
   review(id: ID!): Review
 }

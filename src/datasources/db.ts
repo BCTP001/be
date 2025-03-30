@@ -226,4 +226,12 @@ export class DB extends BatchedSQLDataSource {
       .whereIn("isbn", isbnList)
       .del();
   };
+
+  getLikeBooks = async (userId: Id): Promise<{ isbn: string }[]> => {
+    const likeRows = await this.db.query
+      .select("isbn")
+      .from("likes")
+      .where({ userId });
+    return likeRows.map((row) => ({ isbn: row.isbn }));
+  };
 }

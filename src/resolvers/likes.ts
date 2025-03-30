@@ -10,6 +10,40 @@ import type {
 import { GetBookInfoItem } from "@interface/aladin";
 
 export const likesResolvers: Resolvers = {
+  Query: {
+    getLikeBooks: async (
+      _: any,
+      __: any,
+      { dataSources, userId }: Context,
+    ): Promise<BookSchema[]> => {
+      try {
+        if (!userId) {
+          throw new GraphQLError(
+            "You can get LikeBooks when you're signed in.",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        const isbn13List: { isbn: string }[] =
+          await dataSources.db.getLikeBooks(userId);
+
+        const bookInfoList: Promise<GetBookInfoItem>[] = [];
+
+        isbn13List.map((value) => {
+          bookInfoList.push(dataSources.aladin.getBookInfo(value.isbn));
+        });
+
+        return await Promise.all(bookInfoList);
+      } catch (err) {
+        throw new GraphQLError(err);
+      }
+    },
+  },
+
   Mutation: {
     updateLikeBooks: async (
       _: any,
