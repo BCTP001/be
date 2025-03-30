@@ -3,6 +3,7 @@ import { GraphQLError } from "graphql";
 import { Context } from "@interface/context";
 import { type Resolvers } from "@generated";
 import type {
+  BookSchema,
   CreateShelfRequest,
   CreateShelfResponse,
   UpdateShelfRequest,
@@ -77,8 +78,35 @@ export const shelfResolvers: Resolvers = {
           (isbn13) => !existingBooks.includes(isbn13),
         );
 
+        const bookInfoPromiseObjList: Promise<GetBookInfoItem>[] = [];
+
+        newBooks.map((value) => {
+          bookInfoPromiseObjList.push(dataSources.aladin.getBookInfo(value));
+        });
+
+        const bookInfoObjList: GetBookInfoItem[] = await Promise.all(
+          bookInfoPromiseObjList,
+        );
+
+        const bookInfoList: BookSchema[] = bookInfoObjList.map((item) => ({
+          isbn: item.isbn13,
+          title: item.title,
+          link: item.link,
+          author: item.author,
+          pubDate: item.pubDate,
+          description: item.description,
+          creator: item.creator,
+          cover: item.cover,
+          categoryId: item.categoryId,
+          categoryName: item.categoryName,
+          publisher: item.publisher,
+          customerReviewRank: item.customerReviewRank,
+        }));
+
         await Promise.all(
-          newBooks.map((isbn13) => dataSources.db.insertBook(isbn13)),
+          bookInfoList.map((bookInfoItem) =>
+            dataSources.db.insertBook(bookInfoItem),
+          ),
         );
 
         const shelfInfo = await dataSources.db.getShelfInfo(request.shelfName);

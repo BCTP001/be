@@ -100,3 +100,17 @@ export interface UpdateLikeBooksRequest {
 export interface UpdateLikeBooksResponse {
   msg: string;
 }
+export interface BookSchema {
+  isbn: string;
+  title: string;
+  link: string;
+  author: string;
+  pubDate: string;
+  description: string;
+  creator: string;
+  cover: string;
+  categoryId: number;
+  categoryName: string;
+  publisher: string;
+  customerReviewRank: number;
+}

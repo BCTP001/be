@@ -13,6 +13,7 @@ import {
   Password,
   WelcomePackage,
   Useruser,
+  BookSchema,
 } from "@interface/db";
 import { GraphQLError } from "graphql";
 import { checkPw } from "@utils";
@@ -127,8 +128,8 @@ export class DB extends BatchedSQLDataSource {
     return existingBooks.map((book) => book.isbn);
   };
 
-  insertBook = async (isbn: string): Promise<void> => {
-    await this.db.write.insert({ isbn }).into("book");
+  insertBook = async (bookInfoObject: BookSchema): Promise<void> => {
+    await this.db.write.insert(bookInfoObject).into("book");
   };
 
   createShelf = async (userId: Id, name: string): Promise<void> => {
@@ -211,12 +212,18 @@ export class DB extends BatchedSQLDataSource {
 
   insertLikes = async (userId: Id, isbnList: string[]): Promise<void> => {
     const newLikes = isbnList.map((isbn) => ({ userId, isbn }));
-    await this.db.write.insert(newLikes).into("likes")
-    .onConflict(["userId", "isbn"])
-    .ignore();
-  }
+    await this.db.write
+      .insert(newLikes)
+      .into("likes")
+      .onConflict(["userId", "isbn"])
+      .ignore();
+  };
 
   deleteLikes = async (userId: Id, isbnList: string[]): Promise<void> => {
-    await this.db.write.from("likes").where({ userId }).whereIn("isbn", isbnList).del();
-  }
+    await this.db.write
+      .from("likes")
+      .where({ userId })
+      .whereIn("isbn", isbnList)
+      .del();
+  };
 }

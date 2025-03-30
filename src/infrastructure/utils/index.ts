@@ -37,32 +37,30 @@ export function signJWT(userId: string) {
 
 export function verifyJWT(token: string): {
   userId: string;
-  isNotExp: boolean;
+  isExpSoon: boolean;
 } {
   try {
     const decoded = jwt.verify(token, process.env.PUBLIC_KEY) as DecodedToken;
     const currentTime: number = Math.floor(Date.now() / 1000);
 
-    if (decoded.exp < currentTime) {
-      throw new GraphQLError("You are not Signed in", {
-        extensions: {
-          code: "UNAUTHENTICATED",
-        },
-      });
-    }
-
     if (decoded.exp - currentTime < 3600) {
       return {
         userId: decoded.userId,
-        isNotExp: false,
+        isExpSoon: true,
       };
     }
 
     return {
       userId: decoded.userId,
-      isNotExp: true,
+      isExpSoon: false,
     };
   } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      return {
+        userId: null,
+        isExpSoon: false,
+      };
+    }
     throw new GraphQLError(err);
   }
 }
