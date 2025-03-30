@@ -2,7 +2,7 @@
 import { GraphQLError } from "graphql";
 import { Context } from "@interface/context";
 import { type Resolvers } from "@generated";
-import { type Feed } from "@interface/db";
+import { PgFeedObject, type Feed } from "@interface/db";
 
 export const feedResolvers: Resolvers = {
   Query: {
@@ -12,7 +12,7 @@ export const feedResolvers: Resolvers = {
       { dataSources }: Context,
     ): Promise<Feed[]> => {
       try {
-        const pgData = await dataSources.db.getFeed();
+        const pgData: PgFeedObject[] = await dataSources.db.getFeed();
 
         const bookInfoList = await Promise.all(
           pgData.map(({ isbn13 }) => dataSources.aladin.getBookInfo(isbn13)),

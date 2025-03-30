@@ -4,24 +4,32 @@ import { Context } from "@interface/context";
 import { type Resolvers } from "@generated";
 import type {
   BookSchema,
-  CreateShelfRequest,
-  CreateShelfResponse,
-  UpdateShelfRequest,
-  UpdateShelfResponse,
-  getBooksInShelfRequest,
+  UpdateLikeBooksRequest,
+  UpdateLikeBooksResponse,
 } from "@interface/db";
-import { type GetBookInfoItem } from "@interface/aladin";
+import { GetBookInfoItem } from "@interface/aladin";
 
-export const shelfResolvers: Resolvers = {
+export const likesResolvers: Resolvers = {
   Query: {
-    getBooksInShelf: async (
+    getLikeBooks: async (
       _: any,
-      { request }: { request: getBooksInShelfRequest },
-      { dataSources }: Context,
-    ): Promise<GetBookInfoItem[]> => {
+      __: any,
+      { dataSources, userId }: Context,
+    ): Promise<BookSchema[]> => {
       try {
+        if (!userId) {
+          throw new GraphQLError(
+            "You can get LikeBooks when you're signed in.",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
         const isbn13List: { isbn: string }[] =
-          await dataSources.db.getBooksInShelf(request.shelfName);
+          await dataSources.db.getLikeBooks(userId);
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -35,16 +43,17 @@ export const shelfResolvers: Resolvers = {
       }
     },
   },
+
   Mutation: {
-    createShelf: async (
+    updateLikeBooks: async (
       _: any,
-      { request }: { request: CreateShelfRequest },
+      { request }: { request: UpdateLikeBooksRequest },
       { dataSources, userId }: Context,
-    ): Promise<CreateShelfResponse> => {
+    ): Promise<UpdateLikeBooksResponse> => {
       try {
         if (!userId) {
           throw new GraphQLError(
-            "You can create Shelf when you're signed in.",
+            "You can update LikeBooks when you're signed in.",
             {
               extensions: {
                 code: "FORBIDDEN",
@@ -53,22 +62,6 @@ export const shelfResolvers: Resolvers = {
           );
         }
 
-        dataSources.db.createShelf(userId, request.shelfName);
-
-        return {
-          msg: `${request.shelfName} Shelf Create Success!!`,
-        };
-      } catch (err) {
-        throw new GraphQLError(err);
-      }
-    },
-
-    updateShelf: async (
-      _: any,
-      { request }: { request: UpdateShelfRequest },
-      { dataSources }: Context,
-    ): Promise<UpdateShelfResponse> => {
-      try {
         const existingBooks = await dataSources.db.getExistingBooks([
           ...request.containList,
           ...request.excludeList,
@@ -109,25 +102,14 @@ export const shelfResolvers: Resolvers = {
           ),
         );
 
-        const shelfInfo = await dataSources.db.getShelfInfo(request.shelfName);
+        if (request.containList.length)
+          dataSources.db.insertLikes(userId, request.containList);
 
-        await Promise.all(
-          request.containList.map((isbn13) =>
-            dataSources.db.insertContains(shelfInfo.id, isbn13),
-          ),
-        );
-
-        const removableBooks = request.excludeList.filter((isbn13) =>
-          existingBooks.includes(isbn13),
-        );
-
-        await Promise.all(
-          removableBooks.map((isbn13) => dataSources.db.deleteContains(isbn13)),
-        );
+        if (request.excludeList.length)
+          dataSources.db.deleteLikes(userId, request.excludeList);
 
         return {
-          msg: "Shelf Update Success!!",
-          shelfName: shelfInfo.name,
+          msg: "LikeBooks Update Success!!",
         };
       } catch (err) {
         throw new GraphQLError(err);

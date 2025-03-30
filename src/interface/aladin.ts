@@ -91,7 +91,7 @@ export interface GetBookInfoItem {
   categoryId: number;
   categoryName: string;
   publisher: string;
-  customerReivewRank: number;
+  customerReviewRank: number;
   bookinfo: Bookinfo;
 }
 
