@@ -30,7 +30,6 @@ export const feedResolvers: Resolvers = {
           rating: data.rating,
         }));
       } catch (err) {
-        console.log(err);
         throw new GraphQLError(err);
       }
     },

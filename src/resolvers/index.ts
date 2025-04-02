@@ -4,6 +4,7 @@ import { reviewResolvers } from "./review";
 import { feedResolvers } from "./feed";
 import { shelfResolvers } from "./shelf";
 import { likesResolvers } from "./likes";
+import { articleResolvers } from "./article";
 import { aladinResolvers } from "./aladin";
 
 const resolvers: Resolvers[] = [
@@ -13,6 +14,7 @@ const resolvers: Resolvers[] = [
   shelfResolvers,
   likesResolvers,
   aladinResolvers,
+  articleResolvers,
 ];
 
 export default resolvers;

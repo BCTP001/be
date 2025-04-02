@@ -82,7 +82,6 @@ export const userResolvers: Resolvers = {
         password,
       );
       setCookie(cookies, welcomePackage.signedInAs.id);
-
       return welcomePackage;
     },
     signOut: async (

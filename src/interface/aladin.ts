@@ -25,7 +25,7 @@ export interface AladinAPIBookItem {
   categoryId: number;
   categoryName: string;
   publisher: string;
-  customerReivewRank: number;
+  customerReviewRank: number;
 }
 
 export interface AladinAPISearchResponse {

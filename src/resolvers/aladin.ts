@@ -32,7 +32,6 @@ export const aladinResolvers: Resolvers = {
 
         return await Promise.all(response);
       } catch (err) {
-        console.log(err);
         throw new GraphQLError(err);
       }
     },
@@ -53,7 +52,6 @@ export const aladinResolvers: Resolvers = {
 
         return bookInfo;
       } catch (err) {
-        console.log(err);
         throw new GraphQLError(err);
       }
     },
@@ -78,7 +76,6 @@ export const aladinResolvers: Resolvers = {
 
         return await Promise.all(bookInfoList);
       } catch (err) {
-        console.log(err);
         throw new GraphQLError(err);
       }
     },

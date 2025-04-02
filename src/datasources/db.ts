@@ -14,6 +14,7 @@ import {
   WelcomePackage,
   Useruser,
   BookSchema,
+  ArticleSchema,
 } from "@interface/db";
 import { GraphQLError } from "graphql";
 import { checkPw } from "@utils";
@@ -129,7 +130,11 @@ export class DB extends BatchedSQLDataSource {
   };
 
   insertBook = async (bookInfoObject: BookSchema): Promise<void> => {
-    await this.db.write.insert(bookInfoObject).into("book");
+    await this.db.write
+      .insert(bookInfoObject)
+      .into("book")
+      .onConflict(["isbn"])
+      .ignore();
   };
 
   createShelf = async (userId: Id, name: string): Promise<void> => {
@@ -233,5 +238,9 @@ export class DB extends BatchedSQLDataSource {
       .from("likes")
       .where({ userId });
     return likeRows.map((row) => ({ isbn: row.isbn }));
+  };
+
+  createArticle = async (articleInfo: ArticleSchema): Promise<void> => {
+    await this.db.write.insert(articleInfo).into("article");
   };
 }

@@ -57,7 +57,7 @@ type GetBookInfoItem {
   categoryId: Int
   categoryName: String
   publisher: String
-  customerReivewRank: Int
+  customerReviewRank: Int
   bookinfo: Bookinfo
 }
 
@@ -122,6 +122,16 @@ type UpdateLikeBooksResponse {
   msg: String
 }
 
+input CreateArticleRequest{
+  articleTitle: String
+  articleContent: String
+  isbn: String
+}
+
+type CreateArticleResponse{
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -143,6 +153,7 @@ type Mutation {
   createReview(createReviewArgs: CreateReviewArgs!): ID
   updateReview(updateReviewArgs: UpdateReviewArgs!): ID
   deleteReview(id: ID!): ID
+  createArticle(request: CreateArticleRequest!): CreateArticleResponse
   signUp(name: String!, username: String!, password: String!): User
   signIn(username: String!, password: String!): WelcomePackage
   signOut: Void

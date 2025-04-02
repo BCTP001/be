@@ -114,3 +114,20 @@ export interface BookSchema {
   publisher: string;
   customerReviewRank: number;
 }
+
+export interface CreateArticleRequest {
+  articleTitle: string;
+  articleContent: string;
+  isbn: string;
+}
+
+export interface CreateArticleResponse {
+  msg: string;
+}
+
+export interface ArticleSchema {
+  title: string;
+  content: string;
+  userId: Id;
+  isbn: string;
+}
