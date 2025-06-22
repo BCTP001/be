@@ -12,6 +12,7 @@ export default [
       "codegen.ts",
       "dist",
       "node_modules",
+      "docker/local.pgdata",
     ],
   },
   { languageOptions: { globals: globals.node } },

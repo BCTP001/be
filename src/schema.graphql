@@ -107,6 +107,7 @@ type UpdateShelfResponse {
 
 input CreateShelfRequest {
   shelfName: String
+  userId: String
 }
 
 type CreateShelfResponse {

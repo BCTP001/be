@@ -39,21 +39,10 @@ export const shelfResolvers: Resolvers = {
     createShelf: async (
       _: any,
       { request }: { request: CreateShelfRequest },
-      { dataSources, userId }: Context,
+      { dataSources }: Context,
     ): Promise<CreateShelfResponse> => {
       try {
-        if (!userId) {
-          throw new GraphQLError(
-            "You can create Shelf when you're signed in.",
-            {
-              extensions: {
-                code: "FORBIDDEN",
-              },
-            },
-          );
-        }
-
-        dataSources.db.createShelf(userId, request.shelfName);
+        dataSources.db.createShelf(request.userId, request.shelfName);
 
         return {
           msg: `${request.shelfName} Shelf Create Success!!`,

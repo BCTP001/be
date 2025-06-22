@@ -61,6 +61,7 @@ export interface UpdateShelfResponse {
 
 export interface CreateShelfRequest {
   shelfName: string;
+  userId: Id;
 }
 
 export interface CreateShelfResponse {
