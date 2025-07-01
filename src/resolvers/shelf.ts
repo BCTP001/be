@@ -60,7 +60,6 @@ export const shelfResolvers: Resolvers = {
       try {
         const existingBooks = await dataSources.db.getExistingBooks([
           ...request.containList,
-          ...request.excludeList,
         ]);
 
         const newBooks = request.containList.filter(
@@ -106,8 +105,16 @@ export const shelfResolvers: Resolvers = {
           ),
         );
 
+        const alreadyContainBooks = dataSources.db.getBooksInShelf(
+          request.shelfName,
+        );
+
+        const existingBooksInShelf = (await alreadyContainBooks).map(
+          (book) => book.isbn,
+        );
+
         const removableBooks = request.excludeList.filter((isbn13) =>
-          existingBooks.includes(isbn13),
+          existingBooksInShelf.includes(isbn13),
         );
 
         await Promise.all(

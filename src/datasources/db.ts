@@ -129,7 +129,11 @@ export class DB extends BatchedSQLDataSource {
   };
 
   insertBook = async (bookInfoObject: BookSchema): Promise<void> => {
-    await this.db.write.insert(bookInfoObject).into("book");
+    await this.db.write
+      .insert(bookInfoObject)
+      .into("book")
+      .onConflict("isbn")
+      .ignore();
   };
 
   createShelf = async (userId: Id, name: string): Promise<void> => {
