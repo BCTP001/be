@@ -1,13 +1,25 @@
 import pandas as pd
-from sentence_transformers import SentenceTransformer, util
-import faiss # Import FAISS
+import faiss
+import os
+import numpy as np
+import cohere # Import Cohere library
+import time # Import time for delays
 
 # --- Configuration ---
-CSV_FILE_PATH = 'booktemp.csv'
-FAISS_INDEX_FILE_PATH = 'book_faiss_index.bin' # File to save FAISS index
-BOOK_DATA_FILE_PATH = 'book_data.parquet' # File to save DataFrame
-MODEL_NAME = 'all-mpnet-base-v2'
-# 'all-MiniLM-L6-v2'
+CSV_FILE_PATH = '../booktemp.csv'
+FAISS_INDEX_FILE_PATH = 'book_faiss_index.bin'
+BOOK_DATA_FILE_PATH = 'book_data.parquet'
+
+# Cohere Configuration
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+if not COHERE_API_KEY:
+    print("Error: COHERE_API_KEY environment variable not set.")
+    print("Please set your Cohere API key (from cohere.com) before running the script.")
+    exit()
+
+COHERE_EMBEDDING_MODEL = "embed-multilingual-v3.0"
+BATCH_SIZE = 50 # Number of texts to send in each API call (Cohere limit is 96 for this model)
+DELAY_BETWEEN_BATCHES = 0.5 # Delay in seconds between API calls to avoid rate limits
 
 # --- Load Data ---
 try:
@@ -26,50 +38,90 @@ except Exception as e:
     exit()
 
 # --- Preprocessing ---
-booktemp['description'] = booktemp['description'].fillna('')
-booktemp['title'] = booktemp['title'].fillna('')
-booktemp['combined_text'] = booktemp['title'] + ". " + booktemp['title'] + ". " + booktemp['description']
-# --- Model Loading ---
-print(f"\nLoading Sentence Transformer model: {MODEL_NAME}...")
-try:
-    model = SentenceTransformer(MODEL_NAME)
-    print("Model loaded successfully.")
-except Exception as e:
-    print(f"Error loading model '{MODEL_NAME}': {e}")
+booktemp['description'] = booktemp['description'].fillna('').astype(str).str.strip()
+booktemp['title'] = booktemp['title'].fillna('').astype(str).str.strip()
+
+booktemp['combined_text'] = booktemp['title'] + ". " + booktemp['description']
+booktemp['combined_text'] = booktemp['combined_text'].str.strip()
+
+# --- Filter out empty texts BEFORE sending to embedding model ---
+non_empty_mask = booktemp['combined_text'].astype(bool)
+filtered_booktemp = booktemp[non_empty_mask].copy()
+
+print(f"\nOriginal number of books: {len(booktemp)}")
+print(f"Number of books after filtering empty combined_text: {len(filtered_booktemp)}")
+
+if len(filtered_booktemp) == 0:
+    print("Error: No non-empty book descriptions found after filtering. Cannot generate embeddings.")
     exit()
 
-# --- Generate Embeddings ---
-print("\nGenerating embeddings for book titles and descriptions...")
-try:
-    # Ensure embeddings are normalized for cosine similarity with FAISS IndexFlatIP or L2.
-    # Sentence-transformers usually normalize by default, but it's good to be explicit.
-    corpus_embeddings = model.encode(
-        booktemp['combined_text'].tolist(),
-        convert_to_tensor=True,
-        show_progress_bar=True,
-        normalize_embeddings=True # Explicitly normalize embeddings
-    )
-    print(f"Embeddings generated for {len(corpus_embeddings)} books.")
+# --- Diagnostic: Sample combined_text to check content ---
+print("\n--- Sample of combined_text being embedded (first 5 non-empty entries) ---")
+for i, text in enumerate(filtered_booktemp['combined_text'].head(5).tolist()):
+    print(f"Entry {i+1}: '{text[:200]}...'")
+print("------------------------------------------------------------------")
 
-    # Convert embeddings to NumPy array for FAISS
-    corpus_embeddings_np = corpus_embeddings.cpu().numpy()
-    dimension = corpus_embeddings_np.shape[1] # Dimension of the embeddings
+# --- Configure Cohere Client ---
+print(f"\nConfiguring Cohere client with model: {COHERE_EMBEDDING_MODEL}...")
+try:
+    co = cohere.Client(COHERE_API_KEY)
+    print("Cohere client configured successfully.")
+except Exception as e:
+    print(f"Error configuring Cohere client: {e}")
+    exit()
+
+# --- Generate Embeddings using Cohere with Batching and Delay ---
+print("\nGenerating embeddings for book descriptions using Cohere with batching...")
+
+def get_cohere_embeddings_batched(texts: list[str], model_name: str, batch_size: int, delay: float):
+    all_embeddings = []
+    total_texts = len(texts)
+    for i in range(0, total_texts, batch_size):
+        batch_texts = texts[i:i + batch_size]
+        try:
+            print(f"Processing batch {i // batch_size + 1}/{(total_texts + batch_size - 1) // batch_size} ({len(batch_texts)} texts)...")
+            response = co.embed(
+                texts=batch_texts,
+                model=model_name,
+                input_type="search_document",
+                embedding_types=["float"]
+            )
+            all_embeddings.extend(response.embeddings.float)
+            if i + batch_size < total_texts: # Don't delay after the last batch
+                time.sleep(delay) # Pause to respect rate limits
+        except cohere.CohereAPIError as e:
+            print(f"Cohere API Error in batch {i // batch_size + 1}: {e.message} (Status: {e.http_status})")
+            print("Consider increasing DELAY_BETWEEN_BATCHES or reducing BATCH_SIZE.")
+            return None
+        except Exception as e:
+            print(f"An unexpected error occurred during embedding generation for batch {i // batch_size + 1}: {e}")
+            return None
+    return all_embeddings
+
+try:
+    corpus_embeddings_list = get_cohere_embeddings_batched(
+        filtered_booktemp['combined_text'].tolist(),
+        COHERE_EMBEDDING_MODEL,
+        BATCH_SIZE,
+        DELAY_BETWEEN_BATCHES
+    )
+
+    if corpus_embeddings_list is None or len(corpus_embeddings_list) == 0:
+        print("Failed to generate embeddings or generated an empty list. Exiting.")
+        exit()
+
+    corpus_embeddings_np = np.array(corpus_embeddings_list)
+    dimension = corpus_embeddings_np.shape[1]
 
     # --- Build FAISS Index ---
-    # We'll use IndexFlatIP for Inner Product similarity, which is equivalent to
-    # cosine similarity if vectors are normalized (which we did above).
-    # For very large datasets (millions+), consider IndexIVFFlat for approximate search.
     print(f"Building FAISS index (dimension: {dimension})...")
-    index = faiss.IndexFlatIP(dimension) # Inner Product index
-    # If you prefer L2 distance (Euclidean), use:
-    # index = faiss.IndexFlatL2(dimension)
-
-    index.add(corpus_embeddings_np) # Add embeddings to the index
+    index = faiss.IndexFlatIP(dimension)
+    index.add(corpus_embeddings_np)
     print(f"FAISS index built with {index.ntotal} vectors.")
 
     # --- Save FAISS Index and DataFrame ---
+    filtered_booktemp.to_parquet(BOOK_DATA_FILE_PATH)
     faiss.write_index(index, FAISS_INDEX_FILE_PATH)
-    booktemp.to_parquet(BOOK_DATA_FILE_PATH)
     print(f"FAISS index saved to {FAISS_INDEX_FILE_PATH}")
     print(f"Book data saved to {BOOK_DATA_FILE_PATH}")
 
