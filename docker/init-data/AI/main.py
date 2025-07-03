@@ -13,9 +13,7 @@ BOOK_DATA_FILE_PATH = 'book_data.parquet'
 TOP_N_RESULTS = 5
 
 # Cohere Configuration
-# It's crucial to set this environment variable before running the application.
 # Example (Linux/macOS): export COHERE_API_KEY='YOUR_COHERE_API_KEY_HERE'
-# Example (Windows CMD): set COHERE_API_KEY=YOUR_COHERE_API_KEY_HERE
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 # This model must match the one used in prepare_embeddings.py
 COHERE_EMBEDDING_MODEL = "embed-multilingual-v3.0"

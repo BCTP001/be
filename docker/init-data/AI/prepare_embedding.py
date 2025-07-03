@@ -8,7 +8,7 @@ import time # Import time for delays
 # --- Configuration ---
 CSV_FILE_PATH = '../booktemp.csv'
 FAISS_INDEX_FILE_PATH = 'book_faiss_index.bin'
-BOOK_DATA_FILE_PATH = 'book_data.parquet'
+BOOK_DATA_FILE_PATH = 'book_data.json'
 
 # Cohere Configuration
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
@@ -120,7 +120,7 @@ try:
     print(f"FAISS index built with {index.ntotal} vectors.")
 
     # --- Save FAISS Index and DataFrame ---
-    filtered_booktemp.to_parquet(BOOK_DATA_FILE_PATH)
+    filtered_booktemp.to_json('book_data.json', orient='records', force_ascii=False, indent=2)
     faiss.write_index(index, FAISS_INDEX_FILE_PATH)
     print(f"FAISS index saved to {FAISS_INDEX_FILE_PATH}")
     print(f"Book data saved to {BOOK_DATA_FILE_PATH}")
