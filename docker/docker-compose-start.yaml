@@ -9,6 +9,7 @@ services:
       - "./local.pgdata:/var/lib/postgresql/data"
       - "./pginit:/docker-entrypoint-initdb.d"
       - "./init-data:/init-data"
+      - "./init-data/AI:/usr/src/app/docker/init-data/AI"
     ports:
       - "5432:5432"
     environment:
@@ -35,6 +36,7 @@ services:
       - "../package.json:/usr/src/app/package.json"
       - "../package-lock.json:/usr/src/app/package-lock.json"
       - "../tsconfig.json:/usr/src/app/tsconfig.json"
+      - "./init-data/AI:/usr/src/app/docker/init-data/AI"
     ports:
       - "4000:4000"
     command: "sh -c \"npm install && npm start\""
