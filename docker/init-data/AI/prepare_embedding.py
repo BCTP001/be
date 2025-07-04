@@ -23,8 +23,8 @@ DELAY_BETWEEN_BATCHES = 0.5 # Delay in seconds between API calls to avoid rate l
 
 # --- Load Data ---
 try:
-    booktemp = pd.read_csv(CSV_FILE_PATH, sep=',', usecols=[1, 5, 11])
-    booktemp.columns = ['title', 'description', 'categoryname']
+    booktemp = pd.read_csv(CSV_FILE_PATH, sep=',', usecols=[1, 3, 5, 9, 11])
+    booktemp.columns = ['title', 'description', 'categoryname', 'author', 'cover']
     print("Original DataFrame head:")
     print(booktemp.head())
     print("\nDataFrame info:")

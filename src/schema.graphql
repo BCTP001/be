@@ -132,6 +132,8 @@ type RecommendBookInfo {
   title: String
   description: String
   category: String
+  cover: String
+  author: String
 }
 
 type Query {
