@@ -112,6 +112,8 @@ export const aiRecommendationResolvers: Resolvers = {
             title: book.title,
             description: book.description,
             category: book.categoryname,
+            cover: book.cover,
+            author: book.author,
           });
         }
         return searchResults;

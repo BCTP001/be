@@ -125,10 +125,14 @@ export interface RecommendBookInfo {
   title: string;
   description: string;
   category: string;
+  cover: string;
+  author: string;
 }
 
 export interface BookData {
   title: string;
   description: string;
   categoryname: string;
+  cover: string;
+  author: string;
 }
