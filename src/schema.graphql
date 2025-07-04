@@ -123,6 +123,17 @@ type UpdateLikeBooksResponse {
   msg: String
 }
 
+input RecommendBooksRequest{
+  keyword: String
+  top_n: Int
+}
+
+type RecommendBookInfo {
+  title: String
+  description: String
+  category: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -134,6 +145,7 @@ type Query {
   getLikeBooks: [GetBookInfoItem]
   reviews(isbn: String!): [Review!]!
   review(id: ID!): Review
+  recommendBooks(request: RecommendBooksRequest): [RecommendBookInfo]
 }
 
 type Mutation {

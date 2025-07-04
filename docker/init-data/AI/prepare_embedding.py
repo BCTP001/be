@@ -89,10 +89,6 @@ def get_cohere_embeddings_batched(texts: list[str], model_name: str, batch_size:
             all_embeddings.extend(response.embeddings.float)
             if i + batch_size < total_texts: # Don't delay after the last batch
                 time.sleep(delay) # Pause to respect rate limits
-        except cohere.CohereAPIError as e:
-            print(f"Cohere API Error in batch {i // batch_size + 1}: {e.message} (Status: {e.http_status})")
-            print("Consider increasing DELAY_BETWEEN_BATCHES or reducing BATCH_SIZE.")
-            return None
         except Exception as e:
             print(f"An unexpected error occurred during embedding generation for batch {i // batch_size + 1}: {e}")
             return None
@@ -121,6 +117,7 @@ try:
 
     # --- Save FAISS Index and DataFrame ---
     filtered_booktemp.to_json('book_data.json', orient='records', force_ascii=False, indent=2)
+    filtered_booktemp.to_parquet('book_data.parquet')
     faiss.write_index(index, FAISS_INDEX_FILE_PATH)
     print(f"FAISS index saved to {FAISS_INDEX_FILE_PATH}")
     print(f"Book data saved to {BOOK_DATA_FILE_PATH}")

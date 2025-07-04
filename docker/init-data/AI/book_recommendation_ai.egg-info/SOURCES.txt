@@ -1,7 +1,0 @@
-README.md
-setup.py
-book_recommendation_ai.egg-info/PKG-INFO
-book_recommendation_ai.egg-info/SOURCES.txt
-book_recommendation_ai.egg-info/dependency_links.txt
-book_recommendation_ai.egg-info/requires.txt
-book_recommendation_ai.egg-info/top_level.txt

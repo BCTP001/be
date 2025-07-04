@@ -115,3 +115,20 @@ export interface BookSchema {
   publisher: string;
   customerReviewRank: number;
 }
+
+export interface RecommendBooksRequest {
+  keyword: string;
+  top_n: number;
+}
+
+export interface RecommendBookInfo {
+  title: string;
+  description: string;
+  category: string;
+}
+
+export interface BookData {
+  title: string;
+  description: string;
+  categoryname: string;
+}
