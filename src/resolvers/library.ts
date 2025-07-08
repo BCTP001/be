@@ -11,13 +11,22 @@ import { GraphQLError } from "graphql";
 const Query: QueryResolvers = {
   librariesByUser: async (
     _,
-    args: { id: GqlID },
-    { dataSources }: Context,
+    __,
+    { dataSources, userId }: Context,
   ): Promise<GqlLibraryWithAuthority[]> => {
-    const userId: number = Number(args.id);
+    if (userId === null) {
+      throw new GraphQLError(
+        "You cannot search for information when you're not signed in",
+        {
+          extensions: {
+            code: "FORBIDDEN"
+          },
+        },
+      );
+    }
     const libraries = await dataSources.db.library.selectByUser(
-      dataSources.db,
-      userId,
+      dataSources.db.db.query,
+      Number(userId),
     );
     const res: GqlLibraryWithAuthority[] = [];
     for (const library of libraries) {
@@ -43,12 +52,14 @@ const Mutation: MutationResolvers = {
         },
       );
     }
-    const id = await dataSources.db.library.create(dataSources.db, args.name);
+    const trx = await dataSources.db.db.write.transaction();
+    const id = await dataSources.db.library.create(trx, args.name);
     await dataSources.db.library.assignOwnership(
-      dataSources.db,
+      trx,
       id,
       Number(userId),
     );
+    await trx.commit();
     return String(id);
   },
 };

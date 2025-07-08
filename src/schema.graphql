@@ -148,7 +148,7 @@ type Query {
   reviews(isbn: String!): [Review!]!
   review(id: ID!): Review
   recommendBooks(request: RecommendBooksRequest): [RecommendBookInfo]
-  librariesByUser(id: ID!): [LibraryWithAuthority!]!
+  librariesByUser: [LibraryWithAuthority!]!
 }
 
 type Mutation {
