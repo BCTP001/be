@@ -1,5 +1,5 @@
 import type {
-  Id,
+  Int,
   Isbn,
   Review,
   InsertReviewArgs,
@@ -14,14 +14,20 @@ const rr: QueryResolvers = {
     { isbn }: { isbn: Isbn },
     { dataSources }: Context,
   ): Promise<Review[]> => {
-    return await dataSources.db.searchReviewsByBook(isbn);
+    return await dataSources.db.review.searchReviewsByBook(
+      dataSources.db.db.query,
+      isbn,
+    );
   },
   review: async (
     _,
-    { id }: { id: Id },
+    { id }: { id: Int },
     { dataSources }: Context,
   ): Promise<Review> => {
-    return await dataSources.db.lookupReview(id);
+    return await dataSources.db.review.lookupReview(
+      dataSources.db.db.query,
+      id,
+    );
   },
 };
 
@@ -32,22 +38,31 @@ export const reviewResolvers: Resolvers = {
       _,
       { createReviewArgs }: { createReviewArgs: InsertReviewArgs },
       { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.insertReview(createReviewArgs);
+    ): Promise<Int> => {
+      return await dataSources.db.review.insertReview(
+        dataSources.db.db.write,
+        createReviewArgs,
+      );
     },
     updateReview: async (
       _,
       { updateReviewArgs }: { updateReviewArgs: UpdateReviewArgs },
       { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.updateReview(updateReviewArgs);
+    ): Promise<Int> => {
+      return await dataSources.db.review.updateReview(
+        dataSources.db.db.write,
+        updateReviewArgs,
+      );
     },
     deleteReview: async (
       _,
-      { id }: { id: Id },
+      { id }: { id: Int },
       { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.deleteReview(id);
+    ): Promise<Int> => {
+      return await dataSources.db.review.deleteReview(
+        dataSources.db.db.write,
+        id,
+      );
     },
   },
 };

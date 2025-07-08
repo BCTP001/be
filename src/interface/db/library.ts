@@ -15,7 +15,7 @@ export function libraryWithAuthorityIntoGql(
   src: LibraryWithAuthority,
 ): GqlLibraryWithAuthority {
   return {
-    id: String(src.id),
+    id: src.id,
     name: src.name,
     authority: authorityIntoGql(src.authority),
   };

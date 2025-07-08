@@ -29,7 +29,10 @@ export const likesResolvers: Resolvers = {
         }
 
         const isbn13List: { isbn: string }[] =
-          await dataSources.db.getLikeBooks(userId);
+          await dataSources.db.like.getLikeBooks(
+            dataSources.db.db.query,
+            userId,
+          );
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -62,10 +65,10 @@ export const likesResolvers: Resolvers = {
           );
         }
 
-        const existingBooks = await dataSources.db.getExistingBooks([
-          ...request.containList,
-          ...request.excludeList,
-        ]);
+        const existingBooks = await dataSources.db.book.getExistingBooks(
+          dataSources.db.db.query,
+          [...request.containList, ...request.excludeList],
+        );
 
         const newBooks = request.containList.filter(
           (isbn13) => !existingBooks.includes(isbn13),
@@ -98,15 +101,26 @@ export const likesResolvers: Resolvers = {
 
         await Promise.all(
           bookInfoList.map((bookInfoItem) =>
-            dataSources.db.insertBook(bookInfoItem),
+            dataSources.db.book.insertBook(
+              dataSources.db.db.write,
+              bookInfoItem,
+            ),
           ),
         );
 
         if (request.containList.length)
-          dataSources.db.insertLikes(userId, request.containList);
+          dataSources.db.like.insertLikes(
+            dataSources.db.db.write,
+            userId,
+            request.containList,
+          );
 
         if (request.excludeList.length)
-          dataSources.db.deleteLikes(userId, request.excludeList);
+          dataSources.db.like.deleteLikes(
+            dataSources.db.db.write,
+            userId,
+            request.excludeList,
+          );
 
         return {
           msg: "LikeBooks Update Success!!",

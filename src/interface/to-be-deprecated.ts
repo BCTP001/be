@@ -1,17 +1,17 @@
-export type Id = string;
+export type Int = number;
 export type Username = string;
 export type Name = string;
 export type Password = string;
 export type HashedPw = string;
 
 export interface User {
-  id: Id;
+  id: Int;
   username: Username;
   name: Name;
 }
 
 export interface Useruser {
-  id: Id;
+  id: Int;
   username: Username;
   hashedPw: HashedPw;
   name: Name;
@@ -41,7 +41,7 @@ export interface PgFeedObject {
 }
 
 export interface UserId {
-  userId: number;
+  userId: Int;
 }
 
 export interface getBooksInShelfRequest {
@@ -61,7 +61,7 @@ export interface UpdateShelfResponse {
 
 export interface CreateShelfRequest {
   shelfName: string;
-  userId: Id;
+  userId: Int;
 }
 
 export interface CreateShelfResponse {
@@ -73,22 +73,22 @@ export type Rating = number;
 export type Content = string;
 
 export interface Review {
-  id: Id;
-  userId: Id;
+  id: Int;
+  userId: Int;
   isbn: Isbn;
   rating: Rating;
   content: Content;
 }
 
 export interface InsertReviewArgs {
-  userId: Id;
+  userId: Int;
   isbn: Isbn;
   rating: Rating;
   content: Content;
 }
 
 export interface UpdateReviewArgs {
-  id: Id;
+  id: Int;
   rating: Rating;
   content: Content;
 }

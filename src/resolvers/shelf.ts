@@ -21,7 +21,10 @@ export const shelfResolvers: Resolvers = {
     ): Promise<GetBookInfoItem[]> => {
       try {
         const isbn13List: { isbn: string }[] =
-          await dataSources.db.getBooksInShelf(request.shelfName);
+          await dataSources.db.shelf.getBooksInShelf(
+            dataSources.db.db.query,
+            request.shelfName,
+          );
 
         const bookInfoList: Promise<GetBookInfoItem>[] = [];
 
@@ -42,7 +45,11 @@ export const shelfResolvers: Resolvers = {
       { dataSources }: Context,
     ): Promise<CreateShelfResponse> => {
       try {
-        dataSources.db.createShelf(request.userId, request.shelfName);
+        dataSources.db.shelf.createShelf(
+          dataSources.db.db.write,
+          request.userId,
+          request.shelfName,
+        );
 
         return {
           msg: `${request.shelfName} Shelf Create Success!!`,
@@ -58,9 +65,10 @@ export const shelfResolvers: Resolvers = {
       { dataSources }: Context,
     ): Promise<UpdateShelfResponse> => {
       try {
-        const existingBooks = await dataSources.db.getExistingBooks([
-          ...request.containList,
-        ]);
+        const existingBooks = await dataSources.db.book.getExistingBooks(
+          dataSources.db.db.query,
+          [...request.containList],
+        );
 
         const newBooks = request.containList.filter(
           (isbn13) => !existingBooks.includes(isbn13),
@@ -93,19 +101,30 @@ export const shelfResolvers: Resolvers = {
 
         await Promise.all(
           bookInfoList.map((bookInfoItem) =>
-            dataSources.db.insertBook(bookInfoItem),
+            dataSources.db.book.insertBook(
+              dataSources.db.db.write,
+              bookInfoItem,
+            ),
           ),
         );
 
-        const shelfInfo = await dataSources.db.getShelfInfo(request.shelfName);
+        const shelfInfo = await dataSources.db.shelf.getShelfInfo(
+          dataSources.db.db.query,
+          request.shelfName,
+        );
 
         await Promise.all(
           request.containList.map((isbn13) =>
-            dataSources.db.insertContains(shelfInfo.id, isbn13),
+            dataSources.db.shelf.insertContains(
+              dataSources.db.db.write,
+              shelfInfo.id,
+              isbn13,
+            ),
           ),
         );
 
-        const alreadyContainBooks = dataSources.db.getBooksInShelf(
+        const alreadyContainBooks = dataSources.db.shelf.getBooksInShelf(
+          dataSources.db.db.query,
           request.shelfName,
         );
 
@@ -118,7 +137,12 @@ export const shelfResolvers: Resolvers = {
         );
 
         await Promise.all(
-          removableBooks.map((isbn13) => dataSources.db.deleteContains(isbn13)),
+          removableBooks.map((isbn13) =>
+            dataSources.db.shelf.deleteContains(
+              dataSources.db.db.write,
+              isbn13,
+            ),
+          ),
         );
 
         return {

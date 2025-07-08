@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   User,
-  Id,
+  Int,
   Username,
   Password,
   Name,
@@ -16,27 +16,23 @@ export const userResolvers: Resolvers = {
   Query: {
     user: async (
       _: any,
-      { id }: { id: Id },
+      { id }: { id: Int },
       { dataSources }: Context,
     ): Promise<User> => {
-      return await dataSources.db.findUserById(id);
+      return await dataSources.db.user.findUserById(
+        dataSources.db.db.query,
+        id,
+      );
     },
     users: async (
       _: any,
       __: any,
       { dataSources }: Context,
     ): Promise<User[]> => {
-      return await dataSources.db.findAllUsers();
+      return await dataSources.db.user.findAllUsers(dataSources.db.db.query);
     },
   },
   Mutation: {
-    createUser: async (
-      _: any,
-      { username, name }: { username: Username; name: Name },
-      { dataSources }: Context,
-    ): Promise<User> => {
-      return await dataSources.db.insertUser(username, name);
-    },
     signUp: async (
       _: any,
       {
@@ -62,7 +58,12 @@ export const userResolvers: Resolvers = {
       }
       // Downside: Hashing operation runs even if the username already exists.
       const hashedPw = await hashPw(password);
-      return await dataSources.db.createUser(name, username, hashedPw);
+      return await dataSources.db.user.createUser(
+        dataSources.db.db.query,
+        name,
+        username,
+        hashedPw,
+      );
     },
     signIn: async (
       _: any,
@@ -77,11 +78,12 @@ export const userResolvers: Resolvers = {
         });
       }
 
-      const welcomePackage = await dataSources.db.getWelcomePackage(
+      const welcomePackage = await dataSources.db.user.getWelcomePackage(
+        dataSources.db.db.query,
         username,
         password,
       );
-      setCookie(cookies, welcomePackage.signedInAs.id);
+      setCookie(cookies, String(welcomePackage.signedInAs.id));
 
       return welcomePackage;
     },

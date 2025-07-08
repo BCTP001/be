@@ -42,7 +42,7 @@ const startApolloServer = async () => {
             setCookie(cookies, data.userId);
           }
           userId = data.userId;
-        } catch (e) {
+        } catch {
           cookies.set("bctp_token", null);
           userId = null;
         }
@@ -53,7 +53,7 @@ const startApolloServer = async () => {
           aladin: new Aladin(),
           db: new DB({ cache, knexConfig }),
         },
-        userId,
+        userId: Number(userId),
         cookies,
       };
     },

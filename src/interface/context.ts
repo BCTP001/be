@@ -7,6 +7,6 @@ export type Context = {
     aladin: Aladin;
     db: DB;
   };
-  userId: string;
+  userId: number;
   cookies: Cookies;
 };

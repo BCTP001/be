@@ -1,7 +1,7 @@
-export type ID = string;
+export type Int = number;
 export type String = string;
 export type LibraryWithAuthority = {
-  id: ID;
+  id: Int;
   name: String;
   authority: String;
 };

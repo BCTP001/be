@@ -1,4 +1,4 @@
-import { DataSourceKnex, BatchedSQLDataSource as DB } from "@nic-jennings/sql-datasource";
+import { DataSourceKnex } from "@nic-jennings/sql-datasource";
 import { Id, Name, LibraryWithAuthority } from "@interface/db/library";
 import { Id as UserId } from "@interface/db/user";
 import {
@@ -26,7 +26,10 @@ const library = {
       .into("affiliates");
   },
 
-  async selectByUser(knex: DataSourceKnex, userId: UserId): Promise<LibraryWithAuthority[]> {
+  async selectByUser(
+    knex: DataSourceKnex,
+    userId: UserId,
+  ): Promise<LibraryWithAuthority[]> {
     return await knex
       .select(["libraryId AS id", "name", "authority"])
       .from("affiliates")

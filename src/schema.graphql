@@ -107,7 +107,7 @@ type UpdateShelfResponse {
 
 input CreateShelfRequest {
   shelfName: String
-  userId: String
+  userId: Int!
 }
 
 type CreateShelfResponse {
@@ -140,29 +140,28 @@ type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
   getRecommendBookList(request: recommendBookListRequest!): [GetBookInfoItem]
-  user(id: ID): User
+  user(id: Int!): User
   users: [User]!
   getFeed: [Feed]!
   getBooksInShelf(request: GetBooksInShelfRequest!): [GetBookInfoItem]
   getLikeBooks: [GetBookInfoItem]
   reviews(isbn: String!): [Review!]!
-  review(id: ID!): Review
+  review(id: Int!): Review
   recommendBooks(request: RecommendBooksRequest): [RecommendBookInfo]
   librariesByUser: [LibraryWithAuthority!]!
 }
 
 type Mutation {
-  createUser(username: String!, name: String!): User
   createShelf(request: CreateShelfRequest!): CreateShelfResponse
   updateShelf(request: UpdateShelfRequest!): UpdateShelfResponse
   updateLikeBooks(request: UpdateLikeBooksRequest!): UpdateLikeBooksResponse
-  createReview(createReviewArgs: CreateReviewArgs!): ID
-  updateReview(updateReviewArgs: UpdateReviewArgs!): ID
-  deleteReview(id: ID!): ID
+  createReview(createReviewArgs: CreateReviewArgs!): Int!
+  updateReview(updateReviewArgs: UpdateReviewArgs!): Int!
+  deleteReview(id: Int!): Int!
   signUp(name: String!, username: String!, password: String!): User
   signIn(username: String!, password: String!): WelcomePackage
   signOut: Void
-  createLibrary(name: String!): ID
+  createLibrary(name: String!): Int!
 }
 
 type WelcomePackage {
@@ -170,7 +169,7 @@ type WelcomePackage {
 }
 
 type User {
-  id: ID!
+  id: Int!
   username: String!
   name: String!
 }
@@ -178,22 +177,22 @@ type User {
 # FEATURE/REVIEW
 
 type Review {
-  id: ID!
-  userId: ID!
+  id: Int!
+  userId: Int!
   isbn: String!
   rating: Int!
   content: String
 }
 
 input CreateReviewArgs {
-  userId: ID!
+  userId: Int!
   isbn: String!
   rating: Int!
   content: String
 }
 
 input UpdateReviewArgs {
-  id: ID!
+  id: Int!
   rating: Int!
   content: String
 }
@@ -201,7 +200,7 @@ input UpdateReviewArgs {
 # Feature "library"
 
 type LibraryWithAuthority {
-  id: ID!
+  id: Int!
   name: String
   authority: String
 }

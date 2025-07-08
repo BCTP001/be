@@ -1,7 +1,7 @@
 import { libraryWithAuthorityIntoGql } from "@interface/db/library";
 import { MutationResolvers, QueryResolvers, Resolvers } from "@generated";
 import {
-  ID as GqlID,
+  Int as GqlInt,
   String as GqlString,
   LibraryWithAuthority as GqlLibraryWithAuthority,
 } from "@interface/graphql";
@@ -19,7 +19,7 @@ const Query: QueryResolvers = {
         "You cannot search for information when you're not signed in",
         {
           extensions: {
-            code: "FORBIDDEN"
+            code: "FORBIDDEN",
           },
         },
       );
@@ -31,7 +31,7 @@ const Query: QueryResolvers = {
     const res: GqlLibraryWithAuthority[] = [];
     for (const library of libraries) {
       res.push(libraryWithAuthorityIntoGql(library));
-    }  
+    }
     return res;
   },
 };
@@ -41,26 +41,22 @@ const Mutation: MutationResolvers = {
     _,
     args: { name: GqlString },
     { dataSources, userId }: Context,
-  ): Promise<GqlID> => {
+  ): Promise<GqlInt> => {
     if (userId === null) {
       throw new GraphQLError(
         "You cannot create a library when you're not signed in",
         {
           extensions: {
-            code: "FORBIDDEN"
+            code: "FORBIDDEN",
           },
         },
       );
     }
     const trx = await dataSources.db.db.write.transaction();
     const id = await dataSources.db.library.create(trx, args.name);
-    await dataSources.db.library.assignOwnership(
-      trx,
-      id,
-      Number(userId),
-    );
+    await dataSources.db.library.assignOwnership(trx, id, Number(userId));
     await trx.commit();
-    return String(id);
+    return id;
   },
 };
 
