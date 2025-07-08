@@ -16,6 +16,7 @@ import {
   BookSchema,
 } from "@interface/to-be-deprecated";
 import library from "@datasources/db/library";
+import user from "@datasources/db/user";
 import { GraphQLError } from "graphql";
 import { checkPw } from "@utils";
 
@@ -241,4 +242,5 @@ export class DB extends BatchedSQLDataSource {
   };
   
   library = library;
+  user = user;
 }

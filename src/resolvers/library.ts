@@ -6,6 +6,7 @@ import {
   LibraryWithAuthority as GqlLibraryWithAuthority,
 } from "@interface/graphql";
 import { Context } from "@interface/context";
+import { GraphQLError } from "graphql";
 
 const Query: QueryResolvers = {
   librariesByUser: async (
@@ -21,7 +22,7 @@ const Query: QueryResolvers = {
     const res: GqlLibraryWithAuthority[] = [];
     for (const library of libraries) {
       res.push(libraryWithAuthorityIntoGql(library));
-    }
+    }  
     return res;
   },
 };
@@ -31,13 +32,24 @@ const Mutation: MutationResolvers = {
     _,
     args: { name: GqlString },
     { dataSources, userId }: Context,
-  ): Promise<void> => {
+  ): Promise<GqlID> => {
+    if (userId === null) {
+      throw new GraphQLError(
+        "You cannot create a library when you're not signed in",
+        {
+          extensions: {
+            code: "FORBIDDEN"
+          },
+        },
+      );
+    }
     const id = await dataSources.db.library.create(dataSources.db, args.name);
     await dataSources.db.library.assignOwnership(
       dataSources.db,
       id,
       Number(userId),
     );
+    return String(id);
   },
 };
 

@@ -162,7 +162,7 @@ type Mutation {
   signUp(name: String!, username: String!, password: String!): User
   signIn(username: String!, password: String!): WelcomePackage
   signOut: Void
-  createLibrary(name: String!): Void
+  createLibrary(name: String!): ID
 }
 
 type WelcomePackage {
