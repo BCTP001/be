@@ -8,13 +8,16 @@ export type Authority =
   | typeof ManagerAuthority
   | typeof MemberAuthority;
 export function authorityIntoGql(authority: Authority): string {
-  return authority === OwnerAuthority
-    ? "owner"
-    : authority === ManagerAuthority
-      ? "manager"
-      : authority === MemberAuthority
-        ? "member"
-        : null;
+  switch (authority) {
+    case OwnerAuthority:
+      return "owner";
+    case ManagerAuthority:
+      return "manager";
+    case MemberAuthority:
+      return "member";
+    default:
+      return null;
+  }
 }
 export type Affiliates = {
   libraryId: LibraryId;
