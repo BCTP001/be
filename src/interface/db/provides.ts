@@ -1,6 +1,7 @@
-import { Isbn } from "@interface/db/book";
-import { Id as LibraryId } from "@interface/db/library";
+import { Book } from "@interface/db/book";
+import { Library } from "@interface/db/library";
+
 export type Provides = {
-  isbn: Isbn;
-  libraryId: LibraryId;
+  isbn: Book["isbn"];
+  libraryId: Library["id"];
 };

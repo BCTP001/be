@@ -1,28 +1,21 @@
-import { DataSourceKnex } from "@nic-jennings/sql-datasource";
-import { User, Id as UserId, Name, Username } from "@interface/db/user";
-import {
-  HashedPw,
-  Int,
-  Password,
-  Useruser,
-  WelcomePackage,
-} from "@interface/to-be-deprecated";
 import { GraphQLError } from "graphql";
+import { DataSourceKnex } from "@nic-jennings/sql-datasource";
+import { Useruser } from "@interface/db";
 import { checkPw } from "@utils";
 
 const user = {
-  async findById(knex: DataSourceKnex, id: UserId): Promise<User> {
+  async findById(knex: DataSourceKnex, id: Useruser["id"]): Promise<Useruser> {
     const users = await knex.select("*").from("useruser").where({ id });
     return users[0];
   },
 
   async createUser(
     knex: DataSourceKnex,
-    name: Name,
-    username: Username,
-    hashedPw: HashedPw,
-  ): Promise<User> {
-    let createdUsers: User[];
+    name: Useruser["name"],
+    username: Useruser["username"],
+    hashedPw: Useruser["hashedPw"],
+  ): Promise<Useruser> {
+    let createdUsers: Useruser[];
     try {
       createdUsers = await knex
         .insert({ name, username, hashedPw })
@@ -42,11 +35,11 @@ const user = {
     return createdUsers[0];
   },
 
-  async getWelcomePackage(
+  async getIfPasses(
     knex: DataSourceKnex,
-    username: Username,
-    password: Password,
-  ): Promise<WelcomePackage> {
+    username: Useruser["username"],
+    password: string,
+  ): Promise<Useruser> {
     const users: Useruser[] = await knex("useruser")
       .select("*")
       .where({ username });
@@ -66,16 +59,17 @@ const user = {
         },
       });
     }
-    return {
-      signedInAs: user,
-    };
+    return user;
   },
 
-  async findAllUsers(knex: DataSourceKnex): Promise<User[]> {
+  async findAllUsers(knex: DataSourceKnex): Promise<Useruser[]> {
     return await knex.select("*").from("useruser");
   },
 
-  async findUserById(knex: DataSourceKnex, id: Int): Promise<User> {
+  async findUserById(
+    knex: DataSourceKnex,
+    id: Useruser["id"],
+  ): Promise<Useruser> {
     const users = await knex.select("*").from("useruser").where({ id });
     return users[0];
   },

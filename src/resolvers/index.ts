@@ -5,7 +5,7 @@ import { feedResolvers } from "./feed";
 import { shelfResolvers } from "./shelf";
 import { likesResolvers } from "./likes";
 import { aladinResolvers } from "./aladin";
-import { aiRecommendationResolvers } from "./aiRecommendation";
+import { aiRecommendationResolvers } from "./ai-recommendation";
 import { libraryResolvers } from "./library";
 
 const resolvers: Resolvers[] = [

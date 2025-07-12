@@ -1,11 +1,11 @@
 import { DataSourceKnex } from "@nic-jennings/sql-datasource";
-import { Int } from "@interface/to-be-deprecated";
+import { Book, Shelf, Useruser } from "@interface/db";
 
 const shelf = {
   async createShelf(
     knex: DataSourceKnex,
-    userId: Int,
-    name: string,
+    userId: Useruser["id"],
+    name: Shelf["name"],
   ): Promise<void> {
     await knex
       .insert({ name, userId })
@@ -15,7 +15,7 @@ const shelf = {
 
   async getShelfInfo(
     knex: DataSourceKnex,
-    name: string,
+    name: Shelf["name"],
   ): Promise<{ name: string; id: number }> {
     const shelfRow = await knex
       .select("name", "id")
@@ -27,8 +27,8 @@ const shelf = {
 
   async insertContains(
     knex: DataSourceKnex,
-    shelfId: number,
-    isbn: string,
+    shelfId: Shelf["id"],
+    isbn: Book["isbn"],
   ): Promise<void> {
     await knex
       .insert({ shelfId, isbn })
@@ -37,21 +37,24 @@ const shelf = {
       .ignore();
   },
 
-  async deleteContains(knex: DataSourceKnex, isbn: string): Promise<void> {
+  async deleteContains(
+    knex: DataSourceKnex,
+    isbn: Book["isbn"],
+  ): Promise<void> {
     await knex.from("contains").where({ isbn }).del();
   },
 
   async getBooksInShelf(
     knex: DataSourceKnex,
-    shelfName: string,
-  ): Promise<{ isbn: string }[]> {
-    const containsRow = await knex
+    shelfName: Shelf["name"],
+  ): Promise<Book["isbn"][]> {
+    const containsRow: Pick<Book, "isbn">[] = await knex
       .select("c.isbn")
       .from({ s: "shelf" })
       .join({ c: "contains" }, "s.id", "c.shelfId")
       .where("s.name", shelfName);
 
-    return containsRow.map((row) => ({ isbn: row.isbn }));
+    return containsRow.map((row) => row.isbn);
   },
 };
 

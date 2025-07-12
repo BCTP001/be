@@ -1,22 +1,6 @@
-export type Id = number;
-export type Name = string;
+import { Serial, Varchar } from "./pg";
+
 export type Library = {
-  id: Id;
-  name: Name;
+  id: Serial;
+  name: Varchar<20>;
 };
-import { Authority, authorityIntoGql } from "@interface/db/affiliates";
-export type LibraryWithAuthority = {
-  id: Id;
-  name: Name;
-  authority: Authority;
-};
-import { LibraryWithAuthority as GqlLibraryWithAuthority } from "@interface/graphql";
-export function libraryWithAuthorityIntoGql(
-  src: LibraryWithAuthority,
-): GqlLibraryWithAuthority {
-  return {
-    id: src.id,
-    name: src.name,
-    authority: authorityIntoGql(src.authority),
-  };
-}

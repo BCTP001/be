@@ -1,40 +1,56 @@
 import { DataSourceKnex } from "@nic-jennings/sql-datasource";
-import { Id, Name, LibraryWithAuthority } from "@interface/db/library";
-import { Id as UserId } from "@interface/db/user";
-import {
-  OwnerAuthority,
-  // ManagerAuthority,
-  // MemberAuthority,
-} from "@interface/db/affiliates";
+import { Useruser, Library, Affiliates, Authority } from "@interface/db";
 
 const library = {
-  async create(knex: DataSourceKnex, name: Name): Promise<Id> {
-    const created = await knex
-      .insert({ name })
-      .into("library")
-      .returning(["id"]);
-    return created[0].id;
+  async create(
+    knex: DataSourceKnex,
+    name: Library["name"],
+  ): Promise<Library["id"]> {
+    return (await knex.insert({ name }).into("library").returning(["id"]))[0]
+      .id;
   },
 
-  async assignOwnership(knex: DataSourceKnex, id: Id, userId: UserId) {
+  async assignOwnership(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    userId: Useruser["id"],
+  ) {
     await knex
       .insert({
-        libraryId: id,
+        libraryId,
         userId,
-        authority: OwnerAuthority,
+        authority: Authority.Owner,
       })
       .into("affiliates");
   },
 
   async selectByUser(
     knex: DataSourceKnex,
-    userId: UserId,
-  ): Promise<LibraryWithAuthority[]> {
+    userId: Useruser["id"],
+  ): Promise<(Library & Pick<Affiliates, "authority">)[]> {
     return await knex
       .select(["libraryId AS id", "name", "authority"])
       .from("affiliates")
       .where("userId", userId)
       .join("library", "affiliates.libraryId", "=", "library.id");
+  },
+
+  async lookupMembers(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+  ): Promise<(Omit<Useruser, "hashedPw"> & Pick<Affiliates, "authority">)[]> {
+    return await knex
+      .select([
+        "userId AS id",
+        "username",
+        "name",
+        "profilePic",
+        "bio",
+        "authority",
+      ])
+      .from("affiliates")
+      .where("libraryId", libraryId)
+      .join("useruser", "affiliates.userId", "=", "useruser.id");
   },
 };
 

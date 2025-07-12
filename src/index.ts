@@ -53,7 +53,7 @@ const startApolloServer = async () => {
           aladin: new Aladin(),
           db: new DB({ cache, knexConfig }),
         },
-        userId: Number(userId),
+        userId: userId ? Number(userId) : null,
         cookies,
       };
     },

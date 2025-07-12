@@ -1,21 +1,13 @@
+import { GraphQLError } from "graphql";
+import { Resolvers } from "@generated";
 import type {
-  SearchOption,
-  GetBookInfoRequest,
   GetBookInfoItem,
   RecommendBookIsbnObject,
-  RecommendBookListRequest,
 } from "@interface/aladin";
-import { type Resolvers } from "@generated";
-import { Context } from "@interface/context";
-import { GraphQLError } from "graphql";
 
 export const aladinResolvers: Resolvers = {
   Query: {
-    searchBooksAndGetBookInfo: async (
-      _source: undefined,
-      { searchOption }: { searchOption: SearchOption },
-      { dataSources }: Context,
-    ) => {
+    async searchBooksAndGetBookInfo(_, { searchOption }, { dataSources }) {
       try {
         if (!searchOption || !searchOption.searchQuery) {
           throw new GraphQLError("searchQuery is required");
@@ -37,11 +29,7 @@ export const aladinResolvers: Resolvers = {
       }
     },
 
-    getBookInfo: async (
-      _source: undefined,
-      { getBookInfoRequest }: { getBookInfoRequest: GetBookInfoRequest },
-      { dataSources }: Context,
-    ) => {
+    async getBookInfo(_, { getBookInfoRequest }, { dataSources }) {
       try {
         if (!getBookInfoRequest || !getBookInfoRequest.isbn13) {
           throw new GraphQLError("itemId is required");
@@ -58,11 +46,7 @@ export const aladinResolvers: Resolvers = {
       }
     },
 
-    getRecommendBookList: async (
-      _source: undefined,
-      { request }: { request: RecommendBookListRequest },
-      { dataSources }: Context,
-    ) => {
+    async getRecommendBookList(_, { request }, { dataSources }) {
       try {
         if (!request || !request.queryType) {
           throw new GraphQLError("queryType is required");

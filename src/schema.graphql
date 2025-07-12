@@ -149,6 +149,7 @@ type Query {
   review(id: Int!): Review
   recommendBooks(request: RecommendBooksRequest): [RecommendBookInfo]
   librariesByUser: [LibraryWithAuthority!]!
+  usersByLibrary(libraryId: Int!): [UserWithAuthority!]!
 }
 
 type Mutation {
@@ -172,6 +173,8 @@ type User {
   id: Int!
   username: String!
   name: String!
+  profilePic: String
+  bio: String
 }
 
 # FEATURE/REVIEW
@@ -203,4 +206,9 @@ type LibraryWithAuthority {
   id: Int!
   name: String
   authority: String
+}
+
+type UserWithAuthority {
+  user: User!
+  authority: String!
 }

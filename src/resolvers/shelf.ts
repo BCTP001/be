@@ -1,49 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { Context } from "@interface/context";
-import { type Resolvers } from "@generated";
-import type {
-  BookSchema,
-  CreateShelfRequest,
-  CreateShelfResponse,
-  UpdateShelfRequest,
-  UpdateShelfResponse,
-  getBooksInShelfRequest,
-} from "@interface/to-be-deprecated";
-import { type GetBookInfoItem } from "@interface/aladin";
+import { Resolvers } from "@generated";
+import { GetBookInfoItem } from "@interface/aladin";
+import { Book } from "@interface/db";
 
 export const shelfResolvers: Resolvers = {
   Query: {
-    getBooksInShelf: async (
-      _: any,
-      { request }: { request: getBooksInShelfRequest },
-      { dataSources }: Context,
-    ): Promise<GetBookInfoItem[]> => {
+    async getBooksInShelf(_, { request }, { dataSources }) {
       try {
-        const isbn13List: { isbn: string }[] =
-          await dataSources.db.shelf.getBooksInShelf(
-            dataSources.db.db.query,
-            request.shelfName,
-          );
+        const isbn13List: string[] = await dataSources.db.shelf.getBooksInShelf(
+          dataSources.db.db.query,
+          request.shelfName,
+        );
 
-        const bookInfoList: Promise<GetBookInfoItem>[] = [];
-
-        isbn13List.map((value) => {
-          bookInfoList.push(dataSources.aladin.getBookInfo(value.isbn));
-        });
-
-        return await Promise.all(bookInfoList);
+        return await Promise.all(
+          isbn13List.map((isbn) => dataSources.aladin.getBookInfo(isbn)),
+        );
       } catch (err) {
         throw new GraphQLError(err);
       }
     },
   },
   Mutation: {
-    createShelf: async (
-      _: any,
-      { request }: { request: CreateShelfRequest },
-      { dataSources }: Context,
-    ): Promise<CreateShelfResponse> => {
+    async createShelf(_, { request }, { dataSources }) {
       try {
         dataSources.db.shelf.createShelf(
           dataSources.db.db.write,
@@ -59,11 +37,7 @@ export const shelfResolvers: Resolvers = {
       }
     },
 
-    updateShelf: async (
-      _: any,
-      { request }: { request: UpdateShelfRequest },
-      { dataSources }: Context,
-    ): Promise<UpdateShelfResponse> => {
+    async updateShelf(_, { request }, { dataSources }) {
       try {
         const existingBooks = await dataSources.db.book.getExistingBooks(
           dataSources.db.db.query,
@@ -84,12 +58,12 @@ export const shelfResolvers: Resolvers = {
           bookInfoPromiseObjList,
         );
 
-        const bookInfoList: BookSchema[] = bookInfoObjList.map((item) => ({
+        const bookInfoList: Book[] = bookInfoObjList.map((item) => ({
           isbn: item.isbn13,
           title: item.title,
           link: item.link,
           author: item.author,
-          pubDate: item.pubDate,
+          pubDate: new Date(item.pubDate),
           description: item.description,
           creator: item.creator,
           cover: item.cover,
@@ -123,13 +97,9 @@ export const shelfResolvers: Resolvers = {
           ),
         );
 
-        const alreadyContainBooks = dataSources.db.shelf.getBooksInShelf(
+        const existingBooksInShelf = await dataSources.db.shelf.getBooksInShelf(
           dataSources.db.db.query,
           request.shelfName,
-        );
-
-        const existingBooksInShelf = (await alreadyContainBooks).map(
-          (book) => book.isbn,
         );
 
         const removableBooks = request.excludeList.filter((isbn13) =>

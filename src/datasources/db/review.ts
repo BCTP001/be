@@ -1,26 +1,23 @@
 import { DataSourceKnex } from "@nic-jennings/sql-datasource";
-import {
-  InsertReviewArgs,
-  Int,
-  Isbn,
-  Review,
-  UpdateReviewArgs,
-} from "@interface/to-be-deprecated";
+import { Review, Book } from "@interface/db";
 
 const review = {
   async searchReviewsByBook(
     knex: DataSourceKnex,
-    isbn: Isbn,
+    isbn: Book["isbn"],
   ): Promise<Review[]> {
     return await knex.select("*").from("review").where({ isbn });
   },
 
-  async lookupReview(knex: DataSourceKnex, id: Int): Promise<Review> {
+  async lookupReview(knex: DataSourceKnex, id: Review["id"]): Promise<Review> {
     const reviews = await knex.select("*").from("review").where({ id });
     return reviews[0];
   },
 
-  async insertReview(knex: DataSourceKnex, insertReviewArgs: InsertReviewArgs) {
+  async insertReview(
+    knex: DataSourceKnex,
+    insertReviewArgs: Pick<Review, "userId" | "isbn" | "rating" | "content">,
+  ) {
     const newReviews = await knex
       .insert(insertReviewArgs)
       .into("review")
@@ -28,7 +25,10 @@ const review = {
     return newReviews[0].id;
   },
 
-  async updateReview(knex: DataSourceKnex, updateReviewArgs: UpdateReviewArgs) {
+  async updateReview(
+    knex: DataSourceKnex,
+    updateReviewArgs: Pick<Review, "id" | "rating" | "content">,
+  ) {
     const { id, ...updatedInfo } = updateReviewArgs;
     const updatedReviews = await knex
       .table("review")
@@ -37,7 +37,7 @@ const review = {
     return updatedReviews[0].id;
   },
 
-  async deleteReview(knex: DataSourceKnex, id: Int) {
+  async deleteReview(knex: DataSourceKnex, id: Review["id"]) {
     const deletedReviews = await knex("review")
       .where("id", id)
       .del()

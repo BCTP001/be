@@ -1,47 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type {
-  User,
-  Int,
-  Username,
-  Password,
-  Name,
-  WelcomePackage,
-} from "@interface/to-be-deprecated";
-import { type Resolvers } from "@generated";
-import { Context } from "@interface/context";
-import { hashPw, isPasswordSecure, setCookie } from "@utils";
 import { GraphQLError } from "graphql";
+import { Resolvers } from "@generated";
+import { hashPw, isPasswordSecure, setCookie } from "@utils";
 
 export const userResolvers: Resolvers = {
   Query: {
-    user: async (
-      _: any,
-      { id }: { id: Int },
-      { dataSources }: Context,
-    ): Promise<User> => {
+    async user(_, { id }, { dataSources }) {
       return await dataSources.db.user.findUserById(
         dataSources.db.db.query,
         id,
       );
     },
-    users: async (
-      _: any,
-      __: any,
-      { dataSources }: Context,
-    ): Promise<User[]> => {
+    async users(_, __, { dataSources }) {
       return await dataSources.db.user.findAllUsers(dataSources.db.db.query);
     },
   },
   Mutation: {
-    signUp: async (
-      _: any,
-      {
-        username,
-        password,
-        name,
-      }: { username: Username; password: Password; name: Name },
-      { userId, dataSources }: Context,
-    ): Promise<User> => {
+    async signUp(_, { username, password, name }, { userId, dataSources }) {
       if (userId !== null) {
         throw new GraphQLError("You cannot sign up when you're signed in.", {
           extensions: {
@@ -65,11 +39,7 @@ export const userResolvers: Resolvers = {
         hashedPw,
       );
     },
-    signIn: async (
-      _: any,
-      { username, password }: { username: Username; password: Password },
-      { userId, dataSources, cookies }: Context,
-    ): Promise<WelcomePackage> => {
+    async signIn(_, { username, password }, { userId, dataSources, cookies }) {
       if (userId !== null) {
         throw new GraphQLError("You cannot sign in when you're signed in.", {
           extensions: {
@@ -78,20 +48,18 @@ export const userResolvers: Resolvers = {
         });
       }
 
-      const welcomePackage = await dataSources.db.user.getWelcomePackage(
+      const user = await dataSources.db.user.getIfPasses(
         dataSources.db.db.query,
         username,
         password,
       );
-      setCookie(cookies, String(welcomePackage.signedInAs.id));
+      setCookie(cookies, String(user.id));
 
-      return welcomePackage;
+      return {
+        signedInAs: user,
+      };
     },
-    signOut: async (
-      _: any,
-      __: any,
-      { userId, cookies }: Context,
-    ): Promise<void> => {
+    async signOut(_, __, { userId, cookies }) {
       if (userId === null) {
         throw new GraphQLError(
           "You cannot sign out when you're not signed in",

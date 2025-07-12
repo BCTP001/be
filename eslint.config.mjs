@@ -28,7 +28,7 @@ export default [
   },
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-namespace": "off",
       "no-control-regex": 0,
     },
   },
