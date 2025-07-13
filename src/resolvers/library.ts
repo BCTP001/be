@@ -50,6 +50,28 @@ export const libraryResolvers: Resolvers = {
         };
       });
     },
+    async librariesByBook(_, { isbn }, { dataSources, userId }) {
+      if (userId === null) {
+        throw new GraphQLError(
+          "You cannot search for information when you're not signed in",
+          {
+            extensions: {
+              code: "FORBIDDEN",
+            },
+          },
+        );
+      }
+      return (
+        await dataSources.db.library.selectByBook(
+          dataSources.db.db.query,
+          Number(userId),
+          isbn,
+        )
+      ).map((library) => ({
+        ...library,
+        authority: Authority.intoGql(library.authority),
+      }));
+    }
   },
 
   Mutation: {

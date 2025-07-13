@@ -272,8 +272,13 @@ REFERENCES "book" (
 	"isbn"
 );
 
-/* Temporary user for testing */
-INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '1234567890') RETURNING id;
+/* Temporary users for testing */
+/* The common password is "P@$$Word" */
+INSERT INTO useruser("username", "name", "hashedPw") values('jhr', 'Jeong Haram', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('jsh', 'Jeong Seunghyeon', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kjs', 'Kim Junseok', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('ysj', 'Yoon Seokjun', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
 
 INSERT INTO shelf("name", "userId") values('kdh의 책장', 1);
 
@@ -339,7 +344,15 @@ WHERE
 	)
 ;
 
-INSERT INTO library("name") values('전투모의지원중대') RETURNING id;
+INSERT INTO library("name") values('전투모의지원중대');
+INSERT INTO library("name") values('11생활관');
+
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 1, 0);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 2, 1);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(2, 2, 1);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 3, 2);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(2, 3, 0);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 4, 2);
 
 INSERT INTO provides("isbn", "libraryId") values('6000343409', 1);
 INSERT INTO provides("isbn", "libraryId") values('6000692291', 1);
@@ -348,9 +361,11 @@ INSERT INTO provides("isbn", "libraryId") values('6000827706', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809332973646', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809474876812', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809524091073', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809524091073', 2);
 INSERT INTO provides("isbn", "libraryId") values('8809529011793', 1);
-INSERT INTO provides("isbn", "libraryId") values('8809529012158', 1);
-INSERT INTO provides("isbn", "libraryId") values('8809824420900', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809529011793', 2);
+INSERT INTO provides("isbn", "libraryId") values('8809529012158', 2);
+INSERT INTO provides("isbn", "libraryId") values('8809824420900', 2);
 
 INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000343409', 4, '"4 - 3" 이것은 단순한 수식이 아니다. 가슴이 철렁내려앉고, 머리속이 하얗게 질려버리는 충격적인 사건후에 홀로 남은 바버라의 이야기인 것이다.');
 INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000692291', 5, '새처럼 지구의 이곳저곳을 여행하던 저자가, 새를 위해 지구를 위해 여행을 자제하기로 마음먹게 되는 과정이 흥미로웠다. 닮고 싶은 태도, 닮고 싶은 작가다.');

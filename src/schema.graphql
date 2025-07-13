@@ -149,6 +149,7 @@ type Query {
   review(id: Int!): Review
   recommendBooks(request: RecommendBooksRequest): [RecommendBookInfo]
   librariesByUser: [LibraryWithAuthority!]!
+  librariesByBook(isbn: String!): [LibraryWithAuthority!]!
   usersByLibrary(libraryId: Int!): [UserWithAuthority!]!
 }
 
