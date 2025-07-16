@@ -71,7 +71,7 @@ export const libraryResolvers: Resolvers = {
         ...library,
         authority: Authority.intoGql(library.authority),
       }));
-    }
+    },
   },
 
   Mutation: {

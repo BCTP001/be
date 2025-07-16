@@ -38,19 +38,21 @@ const library = {
   async selectByBook(
     knex: DataSourceKnex,
     userId: Useruser["id"],
-    isbn: Book['isbn'],
+    isbn: Book["isbn"],
   ): Promise<(Library & Pick<Affiliates, "authority">)[]> {
     return await knex
-      .with('affiliated', k => k
-        .select(["libraryId AS i", "authority"])
-        .from("affiliates")
-        .where("userId", userId)
+      .with("affiliated", (k) =>
+        k
+          .select(["libraryId AS i", "authority"])
+          .from("affiliates")
+          .where("userId", userId),
       )
-      .with('providing', k => k
-        .select(["i", "authority"])
-        .from("provides")
-        .innerJoin("affiliated", "libraryId", "=", "i")
-        .where("isbn", isbn)
+      .with("providing", (k) =>
+        k
+          .select(["i", "authority"])
+          .from("provides")
+          .innerJoin("affiliated", "libraryId", "=", "i")
+          .where("isbn", isbn),
       )
       .select(["id", "name", "authority"])
       .from("providing")
