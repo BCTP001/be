@@ -73,6 +73,51 @@ export const libraryResolvers: Resolvers = {
         authority: Authority.intoGql(library.authority),
       }));
     },
+
+    async booksByLibrary(_, { libraryId }, { dataSources, userId }) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot search for information when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        const foundLibrary = await dataSources.db.library.selectById(
+          dataSources.db.db.query,
+          libraryId,
+        );
+
+        if (!foundLibrary) {
+          throw new GraphQLError("Library not found. libraryId is not vaild");
+        }
+
+        const rows = await dataSources.db.library.getIsbnBylibraryId(
+          dataSources.db.db.query,
+          libraryId,
+        );
+        const isbnList = rows.map((row) => row.isbn);
+
+        const bookInfoPromiseObjList: Promise<GetBookInfoItem>[] = [];
+
+        isbnList.map((value) => {
+          bookInfoPromiseObjList.push(dataSources.aladin.getBookInfo(value));
+        });
+
+        const bookInfoObjList: GetBookInfoItem[] = await Promise.all(
+          bookInfoPromiseObjList,
+        );
+
+        return bookInfoObjList;
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
   },
 
   Mutation: {
@@ -106,13 +151,7 @@ export const libraryResolvers: Resolvers = {
             },
           );
         }
-        // {
-        //   "request": {
-        //     "isbn": "9783140464079",
-        //     "libraryId": 1,
-        //     "type": "ADD",
-        //   }
-        // }
+
         const { isbn, libraryId, type } = request;
         const requestType = type;
 

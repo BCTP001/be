@@ -101,6 +101,13 @@ const library = {
     return !!result;
   },
 
+  async getIsbnBylibraryId(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+  ): Promise<{ isbn: Book["isbn"] }[]> {
+    return await knex("provides").select("isbn").where("libraryId", libraryId);
+  },
+
   async createRequest(
     knex: DataSourceKnex,
     {

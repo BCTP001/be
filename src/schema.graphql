@@ -166,6 +166,7 @@ type Query {
   librariesByUser: [LibraryWithAuthority!]!
   librariesByBook(isbn: String!): [LibraryWithAuthority!]!
   usersByLibrary(libraryId: Int!): [UserWithAuthority!]!
+  booksByLibrary(libraryId: Int!): [GetBookInfoItem]
 }
 
 type Mutation {
