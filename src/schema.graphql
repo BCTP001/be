@@ -136,6 +136,21 @@ type RecommendBookInfo {
   author: String
 }
 
+enum RequestBookType {
+  ADD
+  REMOVE
+}
+
+input RequestBookInLibraryRequest {
+  type: RequestBookType
+  isbn: String
+  libraryId: Int
+}
+
+type RequestBookInLibraryResponse {
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -164,6 +179,7 @@ type Mutation {
   signIn(username: String!, password: String!): WelcomePackage
   signOut: Void
   createLibrary(name: String!): Int!
+  requestBookInLibrary(request: RequestBookInLibraryRequest): RequestBookInLibraryResponse
 }
 
 type WelcomePackage {

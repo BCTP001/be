@@ -1,9 +1,11 @@
 CREATE TABLE "requests" (
 	"id"	serial		NOT NULL,
-	"time"	timestamp		NOT NULL,
-	"status"	char		NOT NULL,
+	"time" timestamp NOT NULL DEFAULT NOW(),
+	"status" char(1) NOT NULL CHECK (status IN ('P', 'A', 'R')), -- P: Pending, A: Approved, R: Rejected
+	"requestType" VARCHAR(10) NOT NULL CHECK ("requestType" IN ('ADD', 'REMOVE')),
 	"isbn"	varchar(13)		NOT NULL,
-	"libraryId"	serial		NOT NULL
+	"libraryId"	serial		NOT NULL,
+	"userId" serial NOT NULL
 );
 
 CREATE TABLE "useruser" (
@@ -157,6 +159,13 @@ ALTER TABLE "requests" ADD CONSTRAINT "FK_library_TO_requests_1" FOREIGN KEY (
 	"libraryId"
 )
 REFERENCES "library" (
+	"id"
+);
+
+ALTER TABLE "requests" ADD CONSTRAINT "FK_useruser_TO_requests_1" FOREIGN KEY (
+	"userId"
+)
+REFERENCES "useruser" (
 	"id"
 );
 

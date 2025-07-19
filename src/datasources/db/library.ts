@@ -1,5 +1,12 @@
 import { DataSourceKnex } from "@nic-jennings/sql-datasource";
-import { Useruser, Library, Affiliates, Authority, Book } from "@interface/db";
+import {
+  Useruser,
+  Library,
+  Affiliates,
+  Authority,
+  Book,
+  Requests,
+} from "@interface/db";
 
 const library = {
   async create(
@@ -75,6 +82,46 @@ const library = {
       .from("affiliates")
       .where("libraryId", libraryId)
       .join("useruser", "affiliates.userId", "=", "useruser.id");
+  },
+
+  async selectById(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+  ): Promise<Library | null> {
+    const result = await knex("library").where("id", libraryId).first();
+    return result || null;
+  },
+
+  async existsBook(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    isbn: Book["isbn"],
+  ): Promise<boolean> {
+    const result = await knex("provides").where({ libraryId, isbn }).first();
+    return !!result;
+  },
+
+  async createRequest(
+    knex: DataSourceKnex,
+    {
+      isbn,
+      libraryId,
+      userId,
+      requestType,
+    }: {
+      isbn: Book["isbn"];
+      libraryId: Library["id"];
+      userId: Useruser["id"];
+      requestType: Requests["requestType"];
+    },
+  ): Promise<void> {
+    await knex("requests").insert({
+      isbn,
+      libraryId,
+      userId,
+      requestType: requestType,
+      status: "P", // 항상 Pending 상태로 시작
+    });
   },
 };
 
