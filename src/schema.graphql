@@ -166,6 +166,15 @@ type RequestItem {
   userId: Int!
 }
 
+input HandleRequestInLibraryRequest {
+  requestId: Int!
+  newStatus: String!
+}
+
+type HandleRequestInLibraryResponse {
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -197,6 +206,7 @@ type Mutation {
   signOut: Void
   createLibrary(name: String!): Int!
   requestBookInLibrary(request: RequestBookInLibraryRequest): RequestBookInLibraryResponse
+  handleRequestInLibrary(request: HandleRequestInLibraryRequest): HandleRequestInLibraryResponse
 }
 
 type WelcomePackage {

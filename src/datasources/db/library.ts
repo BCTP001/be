@@ -154,6 +154,23 @@ const library = {
       .where("libraryId", libraryId)
       .orderBy("time", "desc");
   },
+
+  async selectByRequestId(
+    knex: DataSourceKnex,
+    requestId: Requests["id"],
+  ): Promise<RequestItem | undefined> {
+    return knex("requests").where("id", requestId).first();
+  },
+
+  async updateStatus(
+    knex: DataSourceKnex,
+    requestId: Requests["id"],
+    newStatus: Requests["status"],
+  ): Promise<void> {
+    return knex("requests")
+      .where("id", requestId)
+      .update({ status: newStatus });
+  },
 };
 
 export default library;

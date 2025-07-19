@@ -284,5 +284,58 @@ export const libraryResolvers: Resolvers = {
         throw new GraphQLError(err);
       }
     },
+
+    async handleRequestInLibrary(_, { request }, { dataSources, userId }) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot handle Request In Library when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+        const { requestId, newStatus } = request;
+
+        const requestItem = await dataSources.db.library.selectByRequestId(
+          dataSources.db.db.query,
+          requestId,
+        );
+        if (!requestItem) {
+          throw new GraphQLError("Request not found.");
+        }
+
+        if (requestItem.status === "A" || requestItem.status === "R") {
+          throw new GraphQLError("이미 처리된 요청입니다.");
+        }
+
+        // const authority = await dataSources.db.library.getAuthorityOfUser(
+        //   dataSources.db.db.query,
+        //   userId,
+        //   libraryId,
+        // );
+
+        // if (authority === null || authority > 1) {
+        //   throw new GraphQLError(
+        //     "Only owner or manager can access this resource.",
+        //   );
+        // }
+
+        await dataSources.db.library.updateStatus(
+          dataSources.db.db.write,
+          requestId,
+          newStatus,
+        );
+
+        return {
+          msg: "도서 요청/폐기 처리가 성공적으로 처리되었습니다.",
+        };
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
   },
 };
