@@ -118,6 +118,56 @@ export const libraryResolvers: Resolvers = {
         throw new GraphQLError(err);
       }
     },
+
+    async getRequestsOfBooksInLibrary(
+      _,
+      { libraryId },
+      { dataSources, userId },
+    ) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot search for information when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        const foundLibrary = await dataSources.db.library.selectById(
+          dataSources.db.db.query,
+          libraryId,
+        );
+
+        if (!foundLibrary) {
+          throw new GraphQLError("Library not found. libraryId is not vaild");
+        }
+
+        // const authority = await dataSources.db.library.getAuthorityOfUser(
+        //   dataSources.db.db.query,
+        //   userId,
+        //   libraryId,
+        // );
+
+        // if (authority === null || authority > 1) {
+        //   throw new GraphQLError(
+        //     "Only owner or manager can access this resource.",
+        //   );
+        // }
+
+        const requests = await dataSources.db.library.selectRequestsByLibraryId(
+          dataSources.db.db.query,
+          libraryId,
+        );
+
+        return requests;
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
   },
 
   Mutation: {

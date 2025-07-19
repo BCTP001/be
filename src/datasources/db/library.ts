@@ -7,6 +7,7 @@ import {
   Book,
   Requests,
 } from "@interface/db";
+import { RequestItem } from "@interface/graphql/library";
 
 const library = {
   async create(
@@ -129,6 +130,29 @@ const library = {
       requestType: requestType,
       status: "P", // 항상 Pending 상태로 시작
     });
+  },
+
+  async getAuthorityOfUser(
+    knex: DataSourceKnex,
+    userId: Useruser["id"],
+    libraryId: Library["id"],
+  ): Promise<number | null> {
+    const result = await knex("affiliates")
+      .select("authority")
+      .where({ userId, libraryId })
+      .first();
+
+    return result?.authority ?? null;
+  },
+
+  async selectRequestsByLibraryId(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+  ): Promise<RequestItem[]> {
+    return await knex("requests")
+      .select("id", "time", "status", "requestType", "isbn", "userId")
+      .where("libraryId", libraryId)
+      .orderBy("time", "desc");
   },
 };
 
