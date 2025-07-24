@@ -91,6 +91,15 @@ CREATE TABLE "likes" (
 	"isbn"	varchar(13)		NOT NULL
 );
 
+CREATE TABLE "requestLibraryMembership" (
+  "id" serial NOT NULL,
+  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "status" char(1) NOT NULL CHECK (status IN ('P', 'A', 'R')), -- P: Pending, A: Approved, R: Rejected
+  "membershipType" VARCHAR(10) NOT NULL CHECK ("membershipType" IN ('JOIN', 'LEAVE')),
+  "libraryId" serial NOT NULL,
+  "userId" serial NOT NULL
+);
+
 ALTER TABLE "requests" ADD CONSTRAINT "PK_REQUESTS" PRIMARY KEY (
 	"id"
 );
@@ -280,6 +289,12 @@ ALTER TABLE "likes" ADD CONSTRAINT "FK_book_TO_likes_1" FOREIGN KEY (
 REFERENCES "book" (
 	"isbn"
 );
+
+ALTER TABLE "requestLibraryMembership" ADD CONSTRAINT "FK_library_TO_requestLibraryMembership_1"
+FOREIGN KEY ("libraryId") REFERENCES "library" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "requestLibraryMembership" ADD CONSTRAINT "FK_useruser_TO_requestLibraryMembership_1"
+FOREIGN KEY ("userId") REFERENCES "useruser" ("id") ON DELETE CASCADE;
 
 /* Temporary users for testing */
 /* The common password is "P@$$Word" */
