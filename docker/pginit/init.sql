@@ -95,7 +95,7 @@ CREATE TABLE "requestLibraryMembership" (
   "id" serial NOT NULL,
   "time" TIMESTAMP NOT NULL DEFAULT NOW(),
   "status" char(1) NOT NULL CHECK (status IN ('P', 'A', 'R')), -- P: Pending, A: Approved, R: Rejected
-  "membershipType" VARCHAR(10) NOT NULL CHECK ("membershipType" IN ('JOIN', 'LEAVE')),
+  "membershipRequestType" VARCHAR(10) NOT NULL CHECK ("membershipRequestType" IN ('JOIN', 'LEAVE', 'MANAGER')), --JOIN: Member / MANAGER: Manager
   "libraryId" serial NOT NULL,
   "userId" serial NOT NULL
 );

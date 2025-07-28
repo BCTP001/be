@@ -337,5 +337,51 @@ export const libraryResolvers: Resolvers = {
         throw new GraphQLError(err);
       }
     },
+
+    async requestLibraryMembership(_, { request }, { dataSources, userId }) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot handle Request In Library when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        const { membershipRequestType, libraryId } = request;
+
+        const foundLibrary = await dataSources.db.library.selectById(
+          dataSources.db.db.query,
+          libraryId,
+        );
+
+        if (!foundLibrary) {
+          throw new GraphQLError("Library not found. libraryId is not vaild");
+        }
+
+        if (!["JOIN", "LEAVE", "MANAGER"].includes(membershipRequestType)) {
+          throw new GraphQLError(
+            "Request type must be 'JOIN', 'LEAVE' or 'MANAGER'.",
+          );
+        }
+
+        await dataSources.db.library.createRequestLibraryMembership(
+          dataSources.db.db.write,
+          libraryId,
+          userId,
+          membershipRequestType,
+        );
+
+        return {
+          msg: "성공적으로 도서관 가입/탈퇴 요청이 완료되었습니다.",
+        };
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
   },
 };

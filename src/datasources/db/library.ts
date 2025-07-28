@@ -8,6 +8,7 @@ import {
   Requests,
 } from "@interface/db";
 import { RequestItem } from "@interface/graphql/library";
+import { RequestLibraryMembership } from "@interface/db/requestLibraryMembership";
 
 const library = {
   async create(
@@ -127,7 +128,7 @@ const library = {
       isbn,
       libraryId,
       userId,
-      requestType: requestType,
+      requestType,
       status: "P", // 항상 Pending 상태로 시작
     });
   },
@@ -170,6 +171,21 @@ const library = {
     return knex("requests")
       .where("id", requestId)
       .update({ status: newStatus });
+  },
+
+  async createRequestLibraryMembership(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    userId: Useruser["id"],
+    membershipRequestType: RequestLibraryMembership["membershipRequestType"],
+  ): Promise<void> {
+    await knex("requestLibraryMembership").insert({
+      time: new Date(),
+      status: "P",
+      membershipRequestType,
+      libraryId,
+      userId,
+    });
   },
 };
 
