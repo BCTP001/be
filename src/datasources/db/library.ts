@@ -7,7 +7,7 @@ import {
   Book,
   Requests,
 } from "@interface/db";
-import { RequestItem } from "@interface/graphql/library";
+import { MembershipRequestItem, RequestItem } from "@interface/graphql/library";
 import { RequestLibraryMembership } from "@interface/db/requestLibraryMembership";
 
 const library = {
@@ -186,6 +186,23 @@ const library = {
       libraryId,
       userId,
     });
+  },
+
+  async selectMembershipRequestsByLibraryId(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+  ): Promise<MembershipRequestItem[]> {
+    return await knex("requestLibraryMembership")
+      .select(
+        "id",
+        "time",
+        "status",
+        "membershipRequestType",
+        "libraryId",
+        "userId",
+      )
+      .where({ libraryId })
+      .orderBy("time", "desc");
   },
 };
 

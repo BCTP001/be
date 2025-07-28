@@ -14,3 +14,12 @@ export interface RequestItem {
   isbn: string;
   userId: number;
 }
+
+export interface MembershipRequestItem {
+  id: number;
+  time: string;
+  status: string;
+  membershipRequestType: string;
+  libraryId: number;
+  userId: number;
+}

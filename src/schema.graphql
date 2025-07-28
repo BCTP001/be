@@ -190,6 +190,15 @@ type RequestLibraryMembershipResponse {
   msg: String
 }
 
+type MembershipRequestItem {
+  id: Int!
+  time: String!
+  status: String!
+  membershipRequestType: String!
+  libraryId: Int!
+  userId: Int!
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -207,6 +216,7 @@ type Query {
   usersByLibrary(libraryId: Int!): [UserWithAuthority!]!
   booksByLibrary(libraryId: Int!): [GetBookInfoItem]
   getRequestsOfBooksInLibrary(libraryId: Int!): [RequestItem!]!
+  getRequestsOfLibraryMembership(libraryId: Int!): [MembershipRequestItem!]!
 }
 
 type Mutation {
