@@ -208,6 +208,10 @@ type ManageLibraryMembershipResponse {
   msg: String
 }
 
+type RemoveLibraryResponse {
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -243,6 +247,7 @@ type Mutation {
   handleRequestInLibrary(request: HandleRequestInLibraryRequest): HandleRequestInLibraryResponse
   requestLibraryMembership(request: RequestLibraryMembershipRequest): RequestLibraryMembershipResponse
   manageLibraryMembership(request: ManageLibraryMembershipRequest): ManageLibraryMembershipResponse
+  removeLibrary(libraryId: Int!): RemoveLibraryResponse!
 }
 
 type WelcomePackage {

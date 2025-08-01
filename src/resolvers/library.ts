@@ -478,12 +478,6 @@ export const libraryResolvers: Resolvers = {
         //   );
         // }
 
-        // + 실제로 affiliates table 에 membershipRequestType 권한대로 insert
-
-        //   const trx = await dataSources.db.db.write.transaction();
-        // const id = await dataSources.db.library.create(trx, args.name);
-        // await dataSources.db.library.assignOwnership(trx, id, Number(userId));
-        // await trx.commit();
         const trx = await dataSources.db.db.write.transaction();
         if (membershipRequestItem.membershipRequestType === "JOIN") {
           await dataSources.db.library.assignMembership(
@@ -515,6 +509,51 @@ export const libraryResolvers: Resolvers = {
 
         return {
           msg: "해당 도서관 가입/탈퇴 요청이 성공적으로 처리되었습니다.",
+        };
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
+
+    async removeLibrary(_, { libraryId }, { dataSources, userId }) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot remove Library when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+
+        // const authority = await dataSources.db.library.getAuthorityOfUser(
+        //   dataSources.db.db.query,
+        //   userId,
+        //   libraryId,
+        // );
+
+        // if (authority !== 0) {
+        //   throw new GraphQLError("Only ownercan access this resource.", {
+        //     extensions: { code: "FORBIDDEN" },
+        //   });
+        // }
+
+        const foundLibrary = await dataSources.db.library.selectById(
+          dataSources.db.db.query,
+          libraryId,
+        );
+
+        if (!foundLibrary) {
+          throw new GraphQLError("Library not found. libraryId is not vaild");
+        }
+
+        await dataSources.db.library.remove(dataSources.db.db.write, libraryId);
+
+        return {
+          msg: "도서관이 성공적으로 삭제되었습니다.",
         };
       } catch (err) {
         console.log(err);

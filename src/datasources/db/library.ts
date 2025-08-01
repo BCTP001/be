@@ -19,6 +19,16 @@ const library = {
       .id;
   },
 
+  async remove(knex: DataSourceKnex, libraryId: Library["id"]): Promise<void> {
+    await knex.transaction(async (trx) => {
+      await trx("affiliates").where({ libraryId }).del();
+      await trx("requestLibraryMembership").where({ libraryId }).del();
+      await trx("provides").where({ libraryId }).del();
+      await trx("requests").where({ libraryId }).del();
+      await trx("library").where({ id: libraryId }).del();
+    });
+  },
+
   async assignOwnership(
     knex: DataSourceKnex,
     libraryId: Library["id"],
