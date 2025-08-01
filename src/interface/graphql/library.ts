@@ -13,6 +13,7 @@ export interface RequestItem {
   requestType: string;
   isbn: string;
   userId: number;
+  libraryId: number;
 }
 
 export interface MembershipRequestItem {

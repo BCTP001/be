@@ -199,6 +199,15 @@ type MembershipRequestItem {
   userId: Int!
 }
 
+input ManageLibraryMembershipRequest {
+  membershipRequestId: Int!
+  newStatus: String!
+}
+
+type ManageLibraryMembershipResponse {
+  msg: String
+}
+
 type Query {
   searchBooksAndGetBookInfo(searchOption: SearchOption!): [GetBookInfoItem]
   getBookInfo(getBookInfoRequest: GetBookInfoRequest!): GetBookInfoItem
@@ -233,6 +242,7 @@ type Mutation {
   requestBookInLibrary(request: RequestBookInLibraryRequest): RequestBookInLibraryResponse
   handleRequestInLibrary(request: HandleRequestInLibraryRequest): HandleRequestInLibraryResponse
   requestLibraryMembership(request: RequestLibraryMembershipRequest): RequestLibraryMembershipResponse
+  manageLibraryMembership(request: ManageLibraryMembershipRequest): ManageLibraryMembershipResponse
 }
 
 type WelcomePackage {

@@ -33,6 +33,47 @@ const library = {
       .into("affiliates");
   },
 
+  async assignMembership(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    userId: Useruser["id"],
+  ) {
+    await knex
+      .insert({
+        libraryId,
+        userId,
+        authority: Authority.Member,
+      })
+      .into("affiliates");
+  },
+
+  async assignManagership(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    userId: Useruser["id"],
+  ) {
+    await knex
+      .insert({
+        libraryId,
+        userId,
+        authority: Authority.Manager,
+      })
+      .into("affiliates");
+  },
+
+  async leaveMembership(
+    knex: DataSourceKnex,
+    libraryId: Library["id"],
+    userId: Useruser["id"],
+  ) {
+    await knex("affiliates")
+      .where({
+        libraryId,
+        userId,
+      })
+      .del();
+  },
+
   async selectByUser(
     knex: DataSourceKnex,
     userId: Useruser["id"],
@@ -151,7 +192,15 @@ const library = {
     libraryId: Library["id"],
   ): Promise<RequestItem[]> {
     return await knex("requests")
-      .select("id", "time", "status", "requestType", "isbn", "userId")
+      .select(
+        "id",
+        "time",
+        "status",
+        "requestType",
+        "isbn",
+        "userId",
+        "libraryId",
+      )
       .where("libraryId", libraryId)
       .orderBy("time", "desc");
   },
@@ -170,6 +219,16 @@ const library = {
   ): Promise<void> {
     return knex("requests")
       .where("id", requestId)
+      .update({ status: newStatus });
+  },
+
+  async updateMembershipRequestStatus(
+    knex: DataSourceKnex,
+    membershipRequestId: RequestLibraryMembership["id"],
+    newStatus: RequestLibraryMembership["status"],
+  ): Promise<void> {
+    return knex("requestLibraryMembership")
+      .where("id", membershipRequestId)
       .update({ status: newStatus });
   },
 
@@ -203,6 +262,15 @@ const library = {
       )
       .where({ libraryId })
       .orderBy("time", "desc");
+  },
+
+  async selectByMembershipRequestId(
+    knex: DataSourceKnex,
+    membershipRequestId: RequestLibraryMembership["id"],
+  ): Promise<MembershipRequestItem | undefined> {
+    return knex("requestLibraryMembership")
+      .where("id", membershipRequestId)
+      .first();
   },
 };
 

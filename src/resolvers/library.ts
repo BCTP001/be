@@ -365,7 +365,7 @@ export const libraryResolvers: Resolvers = {
         // const authority = await dataSources.db.library.getAuthorityOfUser(
         //   dataSources.db.db.query,
         //   userId,
-        //   libraryId,
+        //   requestItem.libraryId,
         // );
 
         // if (authority === null || authority > 1) {
@@ -428,6 +428,93 @@ export const libraryResolvers: Resolvers = {
 
         return {
           msg: "성공적으로 도서관 가입/탈퇴 요청이 완료되었습니다.",
+        };
+      } catch (err) {
+        console.log(err);
+        throw new GraphQLError(err);
+      }
+    },
+
+    async manageLibraryMembership(_, { request }, { dataSources, userId }) {
+      try {
+        if (userId === null) {
+          throw new GraphQLError(
+            "You cannot handle Request In Library when you're not signed in",
+            {
+              extensions: {
+                code: "FORBIDDEN",
+              },
+            },
+          );
+        }
+        const { membershipRequestId, newStatus } = request;
+
+        const membershipRequestItem =
+          await dataSources.db.library.selectByMembershipRequestId(
+            dataSources.db.db.query,
+            membershipRequestId,
+          );
+
+        if (!membershipRequestItem) {
+          throw new GraphQLError("MembershipRequest not found.");
+        }
+
+        if (
+          membershipRequestItem.status === "A" ||
+          membershipRequestItem.status === "R"
+        ) {
+          throw new GraphQLError("이미 처리된 요청입니다.");
+        }
+
+        // const authority = await dataSources.db.library.getAuthorityOfUser(
+        //   dataSources.db.db.query,
+        //   userId,
+        //   MembershipRequestItem.libraryId,
+        // );
+
+        // if (authority === null || authority > 1) {
+        //   throw new GraphQLError(
+        //     "Only owner or manager can access this resource.",
+        //   );
+        // }
+
+        // + 실제로 affiliates table 에 membershipRequestType 권한대로 insert
+
+        //   const trx = await dataSources.db.db.write.transaction();
+        // const id = await dataSources.db.library.create(trx, args.name);
+        // await dataSources.db.library.assignOwnership(trx, id, Number(userId));
+        // await trx.commit();
+        const trx = await dataSources.db.db.write.transaction();
+        if (membershipRequestItem.membershipRequestType === "JOIN") {
+          await dataSources.db.library.assignMembership(
+            trx,
+            membershipRequestItem.libraryId,
+            membershipRequestItem.userId,
+          );
+        } else if (membershipRequestItem.membershipRequestType === "MANAGER") {
+          await dataSources.db.library.assignManagership(
+            trx,
+            membershipRequestItem.libraryId,
+            membershipRequestItem.userId,
+          );
+        } else if (membershipRequestItem.membershipRequestType === "LEAVE") {
+          await dataSources.db.library.leaveMembership(
+            trx,
+            membershipRequestItem.libraryId,
+            membershipRequestItem.userId,
+          );
+        }
+
+        await dataSources.db.library.updateMembershipRequestStatus(
+          trx,
+          membershipRequestId,
+          newStatus,
+        );
+
+        await trx.commit();
+
+        return {
+          msg: "해당 도서관 가입/탈퇴 요청이 성공적으로 처리되었습니다.",
         };
       } catch (err) {
         console.log(err);
