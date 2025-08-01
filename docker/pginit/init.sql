@@ -1,9 +1,11 @@
 CREATE TABLE "requests" (
 	"id"	serial		NOT NULL,
-	"time"	timestamp		NOT NULL,
-	"status"	char		NOT NULL,
+	"time" timestamp NOT NULL DEFAULT NOW(),
+	"status" char(1) NOT NULL CHECK (status IN ('P', 'A', 'R')), -- P: Pending, A: Approved, R: Rejected
+	"requestType" VARCHAR(10) NOT NULL CHECK ("requestType" IN ('ADD', 'REMOVE')),
 	"isbn"	varchar(13)		NOT NULL,
-	"libraryId"	serial		NOT NULL
+	"libraryId"	serial		NOT NULL,
+	"userId" serial NOT NULL
 );
 
 CREATE TABLE "useruser" (
@@ -89,6 +91,15 @@ CREATE TABLE "likes" (
 	"isbn"	varchar(13)		NOT NULL
 );
 
+CREATE TABLE "requestLibraryMembership" (
+  "id" serial NOT NULL,
+  "time" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "status" char(1) NOT NULL CHECK (status IN ('P', 'A', 'R')), -- P: Pending, A: Approved, R: Rejected
+  "membershipRequestType" VARCHAR(10) NOT NULL CHECK ("membershipRequestType" IN ('JOIN', 'LEAVE', 'MANAGER')), --JOIN: Member / MANAGER: Manager
+  "libraryId" serial NOT NULL,
+  "userId" serial NOT NULL
+);
+
 ALTER TABLE "requests" ADD CONSTRAINT "PK_REQUESTS" PRIMARY KEY (
 	"id"
 );
@@ -157,6 +168,13 @@ ALTER TABLE "requests" ADD CONSTRAINT "FK_library_TO_requests_1" FOREIGN KEY (
 	"libraryId"
 )
 REFERENCES "library" (
+	"id"
+);
+
+ALTER TABLE "requests" ADD CONSTRAINT "FK_useruser_TO_requests_1" FOREIGN KEY (
+	"userId"
+)
+REFERENCES "useruser" (
 	"id"
 );
 
@@ -272,8 +290,19 @@ REFERENCES "book" (
 	"isbn"
 );
 
-/* Temporary user for testing */
-INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '1234567890') RETURNING id;
+ALTER TABLE "requestLibraryMembership" ADD CONSTRAINT "FK_library_TO_requestLibraryMembership_1"
+FOREIGN KEY ("libraryId") REFERENCES "library" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "requestLibraryMembership" ADD CONSTRAINT "FK_useruser_TO_requestLibraryMembership_1"
+FOREIGN KEY ("userId") REFERENCES "useruser" ("id") ON DELETE CASCADE;
+
+/* Temporary users for testing */
+/* The common password is "P@$$Word" */
+INSERT INTO useruser("username", "name", "hashedPw") values('jhr', 'Jeong Haram', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kdh', 'Kim Dohyeon', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('jsh', 'Jeong Seunghyeon', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('kjs', 'Kim Junseok', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
+INSERT INTO useruser("username", "name", "hashedPw") values('ysj', 'Yoon Seokjun', '$2b$12$xsRf7g8wPSR1gitKrfsQ7eg9JsYLpxcOtA.KYEmvyPKGE9BwCrcKG') RETURNING id;
 
 INSERT INTO shelf("name", "userId") values('kdh의 책장', 1);
 
@@ -339,7 +368,15 @@ WHERE
 	)
 ;
 
-INSERT INTO library("name") values('전투모의지원중대') RETURNING id;
+INSERT INTO library("name") values('전투모의지원중대');
+INSERT INTO library("name") values('11생활관');
+
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 1, 0);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 2, 1);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(2, 2, 1);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 3, 2);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(2, 3, 0);
+INSERT INTO affiliates("libraryId", "userId", "authority") values(1, 4, 2);
 
 INSERT INTO provides("isbn", "libraryId") values('6000343409', 1);
 INSERT INTO provides("isbn", "libraryId") values('6000692291', 1);
@@ -348,9 +385,11 @@ INSERT INTO provides("isbn", "libraryId") values('6000827706', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809332973646', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809474876812', 1);
 INSERT INTO provides("isbn", "libraryId") values('8809524091073', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809524091073', 2);
 INSERT INTO provides("isbn", "libraryId") values('8809529011793', 1);
-INSERT INTO provides("isbn", "libraryId") values('8809529012158', 1);
-INSERT INTO provides("isbn", "libraryId") values('8809824420900', 1);
+INSERT INTO provides("isbn", "libraryId") values('8809529011793', 2);
+INSERT INTO provides("isbn", "libraryId") values('8809529012158', 2);
+INSERT INTO provides("isbn", "libraryId") values('8809824420900', 2);
 
 INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000343409', 4, '"4 - 3" 이것은 단순한 수식이 아니다. 가슴이 철렁내려앉고, 머리속이 하얗게 질려버리는 충격적인 사건후에 홀로 남은 바버라의 이야기인 것이다.');
 INSERT INTO review("userId", "isbn", "rating", "content") values(1, '6000692291', 5, '새처럼 지구의 이곳저곳을 여행하던 저자가, 새를 위해 지구를 위해 여행을 자제하기로 마음먹게 되는 과정이 흥미로웠다. 닮고 싶은 태도, 닮고 싶은 작가다.');

@@ -36,12 +36,16 @@ const startApolloServer = async () => {
       const cookies = new Cookies(req, res);
       const token = cookies.get("bctp_token");
       if (token) {
-        const data = verifyJWT(token);
-        if (data.isExpSoon) {
-          setCookie(cookies, data.userId);
+        try {
+          const data = verifyJWT(token);
+          if (data.isExpSoon) {
+            setCookie(cookies, data.userId);
+          }
+          userId = data.userId;
+        } catch {
+          cookies.set("bctp_token", null);
+          userId = null;
         }
-
-        userId = data.userId;
       }
 
       return {
@@ -49,7 +53,7 @@ const startApolloServer = async () => {
           aladin: new Aladin(),
           db: new DB({ cache, knexConfig }),
         },
-        userId,
+        userId: userId ? Number(userId) : null,
         cookies,
       };
     },

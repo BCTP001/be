@@ -1,15 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { type Resolvers } from "@generated";
-import {
-  type RecommendBooksRequest,
-  type RecommendBookInfo,
-  type BookData,
-} from "@interface/db";
+import { Resolvers } from "@generated";
 import { Index } from "faiss-node";
 import { CohereClient } from "cohere-ai";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
+import { GQL } from "@interface/graphql";
 const FAISS_INDEX_FILE_PATH = path.resolve(
   __dirname,
   "../../docker/init-data/AI/book_faiss_index.bin",
@@ -39,6 +34,13 @@ const coClient: CohereClient | null = new CohereClient({
   token: COHERE_API_KEY,
 });
 const rawData = readFileSync(BOOK_DATA_FILE_PATH, "utf-8");
+export interface BookData {
+  title: string;
+  description: string;
+  categoryname: string;
+  cover: string;
+  author: string;
+}
 const bookData: BookData[] = JSON.parse(rawData);
 
 export async function initializeApp(): Promise<void> {
@@ -75,15 +77,12 @@ async function getEmbedding(text: string): Promise<number[]> {
     throw new Error("Unexpected embedding response from Cohere.");
   }
 
-  return (response.embeddings as any).float[0];
+  return response.embeddings.float[0];
 }
 
 export const aiRecommendationResolvers: Resolvers = {
   Query: {
-    recommendBooks: async (
-      _: any,
-      { request }: { request: RecommendBooksRequest },
-    ): Promise<RecommendBookInfo[]> => {
+    async recommendBooks(_, { request }) {
       try {
         await initializeApp();
         if (!faissIndex) {
@@ -101,7 +100,7 @@ export const aiRecommendationResolvers: Resolvers = {
         const k = Math.min(request.top_n, faissIndex.ntotal());
         const results = faissIndex.search(queryVector, k);
 
-        const searchResults: RecommendBookInfo[] = [];
+        const searchResults: GQL.RecommendBookInfo[] = [];
         for (let i = 0; i < results.labels.length; i++) {
           const idx = results.labels[i];
 

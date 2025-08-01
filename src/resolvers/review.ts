@@ -1,53 +1,38 @@
-import type {
-  Id,
-  Isbn,
-  Review,
-  InsertReviewArgs,
-  UpdateReviewArgs,
-} from "@interface/db";
-import { QueryResolvers, type Resolvers } from "@generated";
-import { Context } from "@interface/context";
-
-const rr: QueryResolvers = {
-  reviews: async (
-    _,
-    { isbn }: { isbn: Isbn },
-    { dataSources }: Context,
-  ): Promise<Review[]> => {
-    return await dataSources.db.searchReviewsByBook(isbn);
-  },
-  review: async (
-    _,
-    { id }: { id: Id },
-    { dataSources }: Context,
-  ): Promise<Review> => {
-    return await dataSources.db.lookupReview(id);
-  },
-};
+import { Resolvers } from "@generated";
 
 export const reviewResolvers: Resolvers = {
-  Query: rr,
+  Query: {
+    async reviews(_, { isbn }, { dataSources }) {
+      return await dataSources.db.review.searchReviewsByBook(
+        dataSources.db.db.query,
+        isbn,
+      );
+    },
+    async review(_, { id }, { dataSources }) {
+      return await dataSources.db.review.lookupReview(
+        dataSources.db.db.query,
+        id,
+      );
+    },
+  },
   Mutation: {
-    createReview: async (
-      _,
-      { createReviewArgs }: { createReviewArgs: InsertReviewArgs },
-      { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.insertReview(createReviewArgs);
+    async createReview(_, { createReviewArgs }, { dataSources }) {
+      return await dataSources.db.review.insertReview(
+        dataSources.db.db.write,
+        createReviewArgs,
+      );
     },
-    updateReview: async (
-      _,
-      { updateReviewArgs }: { updateReviewArgs: UpdateReviewArgs },
-      { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.updateReview(updateReviewArgs);
+    async updateReview(_, { updateReviewArgs }, { dataSources }) {
+      return await dataSources.db.review.updateReview(
+        dataSources.db.db.write,
+        updateReviewArgs,
+      );
     },
-    deleteReview: async (
-      _,
-      { id }: { id: Id },
-      { dataSources }: Context,
-    ): Promise<Id> => {
-      return await dataSources.db.deleteReview(id);
+    async deleteReview(_, { id }, { dataSources }) {
+      return await dataSources.db.review.deleteReview(
+        dataSources.db.db.write,
+        id,
+      );
     },
   },
 };

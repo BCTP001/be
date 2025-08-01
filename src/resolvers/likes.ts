@@ -1,21 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { Context } from "@interface/context";
-import { type Resolvers } from "@generated";
-import type {
-  BookSchema,
-  UpdateLikeBooksRequest,
-  UpdateLikeBooksResponse,
-} from "@interface/db";
+import { Resolvers } from "@generated";
 import { GetBookInfoItem } from "@interface/aladin";
+import { Book } from "@interface/db";
 
 export const likesResolvers: Resolvers = {
   Query: {
-    getLikeBooks: async (
-      _: any,
-      __: any,
-      { dataSources, userId }: Context,
-    ): Promise<BookSchema[]> => {
+    async getLikeBooks(_, __, { dataSources, userId }) {
       try {
         if (!userId) {
           throw new GraphQLError(
@@ -28,16 +18,14 @@ export const likesResolvers: Resolvers = {
           );
         }
 
-        const isbn13List: { isbn: string }[] =
-          await dataSources.db.getLikeBooks(userId);
+        const isbns: string[] = await dataSources.db.like.getLikeBooks(
+          dataSources.db.db.query,
+          userId,
+        );
 
-        const bookInfoList: Promise<GetBookInfoItem>[] = [];
-
-        isbn13List.map((value) => {
-          bookInfoList.push(dataSources.aladin.getBookInfo(value.isbn));
-        });
-
-        return await Promise.all(bookInfoList);
+        return await Promise.all(
+          isbns.map((isbn) => dataSources.aladin.getBookInfo(isbn)),
+        );
       } catch (err) {
         throw new GraphQLError(err);
       }
@@ -45,11 +33,7 @@ export const likesResolvers: Resolvers = {
   },
 
   Mutation: {
-    updateLikeBooks: async (
-      _: any,
-      { request }: { request: UpdateLikeBooksRequest },
-      { dataSources, userId }: Context,
-    ): Promise<UpdateLikeBooksResponse> => {
+    async updateLikeBooks(_, { request }, { dataSources, userId }) {
       try {
         if (!userId) {
           throw new GraphQLError(
@@ -62,31 +46,25 @@ export const likesResolvers: Resolvers = {
           );
         }
 
-        const existingBooks = await dataSources.db.getExistingBooks([
-          ...request.containList,
-          ...request.excludeList,
-        ]);
+        const existingBooks = await dataSources.db.book.getExistingBooks(
+          dataSources.db.db.query,
+          [...request.containList, ...request.excludeList],
+        );
 
         const newBooks = request.containList.filter(
           (isbn13) => !existingBooks.includes(isbn13),
         );
 
-        const bookInfoPromiseObjList: Promise<GetBookInfoItem>[] = [];
-
-        newBooks.map((value) => {
-          bookInfoPromiseObjList.push(dataSources.aladin.getBookInfo(value));
-        });
-
         const bookInfoObjList: GetBookInfoItem[] = await Promise.all(
-          bookInfoPromiseObjList,
+          newBooks.map((value) => dataSources.aladin.getBookInfo(value)),
         );
 
-        const bookInfoList: BookSchema[] = bookInfoObjList.map((item) => ({
+        const bookInfoList: Book[] = bookInfoObjList.map((item) => ({
           isbn: item.isbn13,
           title: item.title,
           link: item.link,
           author: item.author,
-          pubDate: item.pubDate,
+          pubDate: new Date(item.pubDate),
           description: item.description,
           creator: item.creator,
           cover: item.cover,
@@ -98,15 +76,26 @@ export const likesResolvers: Resolvers = {
 
         await Promise.all(
           bookInfoList.map((bookInfoItem) =>
-            dataSources.db.insertBook(bookInfoItem),
+            dataSources.db.book.insertBook(
+              dataSources.db.db.write,
+              bookInfoItem,
+            ),
           ),
         );
 
         if (request.containList.length)
-          dataSources.db.insertLikes(userId, request.containList);
+          dataSources.db.like.insertLikes(
+            dataSources.db.db.write,
+            userId,
+            request.containList,
+          );
 
         if (request.excludeList.length)
-          dataSources.db.deleteLikes(userId, request.excludeList);
+          dataSources.db.like.deleteLikes(
+            dataSources.db.db.write,
+            userId,
+            request.excludeList,
+          );
 
         return {
           msg: "LikeBooks Update Success!!",

@@ -1,18 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { GraphQLError } from "graphql";
-import { Context } from "@interface/context";
-import { type Resolvers } from "@generated";
-import { PgFeedObject, type Feed } from "@interface/db";
+import { Resolvers } from "@generated";
 
 export const feedResolvers: Resolvers = {
   Query: {
-    getFeed: async (
-      _: any,
-      __: any,
-      { dataSources }: Context,
-    ): Promise<Feed[]> => {
+    async getFeed(_, __, { dataSources }) {
       try {
-        const pgData: PgFeedObject[] = await dataSources.db.getFeed();
+        const pgData = await dataSources.db.getFeed();
 
         const bookInfoList = await Promise.all(
           pgData.map(({ isbn13 }) => dataSources.aladin.getBookInfo(isbn13)),
