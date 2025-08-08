@@ -19,19 +19,19 @@
 ### UI
 <img width="500" height="935" alt="Image1" src="https://github.com/user-attachments/assets/02667f8f-6612-4d23-93eb-00a96357539d" />
 
+<img width="500" height="935" alt="Image4" src="https://github.com/user-attachments/assets/1c69a9a3-fe51-463a-a127-f1679eeeccf8" />
+
+<img width="500" height="935" alt="Image6" src="https://github.com/user-attachments/assets/74d9df7e-d2d3-4d1a-86a7-534ac53b39c0" />
+
+<img width="500" height="935" alt="Image8" src="https://github.com/user-attachments/assets/077081c4-8475-4073-a8c3-22f2a887bb0e" />
+
 <img width="500" height="935" alt="Image2" src="https://github.com/user-attachments/assets/69fbec0b-76f0-4fcd-adfe-6c927f63b0c9" />
 
 <img width="500" height="935" alt="Image3" src="https://github.com/user-attachments/assets/f7170945-e40e-4853-883b-56f5d68a20c2" />
 
-<img width="500" height="935" alt="Image4" src="https://github.com/user-attachments/assets/1c69a9a3-fe51-463a-a127-f1679eeeccf8" />
-
 <img width="500" height="935" alt="Image5" src="https://github.com/user-attachments/assets/05a0057d-4fd8-4abf-b725-622338de4048" />
 
-<img width="500" height="935" alt="Image6" src="https://github.com/user-attachments/assets/74d9df7e-d2d3-4d1a-86a7-534ac53b39c0" />
-
 <img width="500" height="935" alt="Image7" src="https://github.com/user-attachments/assets/eb28e7c5-6e36-4ac9-9bd8-955019f292bf" />
-
-<img width="500" height="935" alt="Image8" src="https://github.com/user-attachments/assets/077081c4-8475-4073-a8c3-22f2a887bb0e" />
 
 
 > 빌드 방법 / API 명세서 : https://coda.io/d/API-DOC_dNtj4OaWXa6/API-DOC_su4MDvPo#_luKdlPkv
